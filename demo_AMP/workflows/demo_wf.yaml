@@ -26,12 +26,22 @@ steps:
     node: platecrane_poly
     action: transfer
     args:
-      # source: "Stack1"
-      # target: "Solo.Position2"
       plate_type: "flat_bottom_96well"
     locations:
       source: "Stack1"
       target: "Solo.Position2"
+      # source:
+      #   location:
+      #     name: "Stack1"
+      #     location_type: "stack"
+      #     joint_angles: [164713, -32703, 450, 5472]
+      #     safe_approach_height: 0
+      # target:
+      #   location:
+      #     name: "Solo.Position2"
+      #     joint_angles: [57372, -27457, -233, 2613]
+      #     location_type: "nest"
+      #     safe_approach_height: 0
     comment: Place plate in Solo Position2
 
   # - name: Remove lid
