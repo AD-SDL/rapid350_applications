@@ -40,9 +40,11 @@ class DemoAMPExperimentApplication(ExperimentApplication):
         hso_1, hso_1_lines, hso_1_basename = package_hso(
             solo_transfer1.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp1.hso"
         )
-        parameters["hso_1"] = hso_1
-        parameters["hso_1_lines"] = hso_1_lines
-        parameters["hso_1_basename"] = hso_1_basename
+        # parameters["hso_1"] = hso_1
+        # parameters["hso_1_lines"] = hso_1_lines
+        # parameters["hso_1_basename"] = hso_1_basename
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"
+
 
         # run the demo workflow
         self.workcell_client.submit_workflow(

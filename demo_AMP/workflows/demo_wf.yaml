@@ -5,24 +5,22 @@ metadata:
   info: Demonstration Workflow for BIO350 Workcell
   version: 0.1
 
-modules:
-  # - name: solo
-  - name: platecrane_poly
-  # - name: hidex
-  # - name: sealer
-  # - name: peeler
-  # - name: liconic
+# modules:
+#   - name: solo_sam
+#   - name: platecrane_poly
+#   - name: hidex_howard
+#   - name: sealer_harp
+#   - name: peeler_potato
+#   - name: liconic_lisa
 
 parameters:
   - name: tip_box_position
-  - name: hso_1
-  - name: hso_1_lines
-  - name: hso_1_basename
+  - name: protocol_file
   - name: shaker_speed
   - name: seal_time
 
 steps:
-  - name: Move plate from Stack1 to Solo.Position2
+  - name: Move plate from Stack1 to Solo.Position2  # WORKS
     node: platecrane_poly
     action: transfer
     args:
@@ -30,7 +28,7 @@ steps:
     locations:
       source: "Stack1"
       target: "Solo.Position2"
-      # source:
+      # source:   # example of using custom locations not defined in the workcell
       #   location:
       #     name: "Stack1"
       #     location_type: "stack"
@@ -44,209 +42,171 @@ steps:
       #     safe_approach_height: 0
     comment: Place plate in Solo Position2
 
-  # - name: Remove lid
-  #   module: platecrane
-  #   action: remove_lid
-  #   args:
-  #     source: "Solo.Position2"
-  #     target: "LidNest1"
-  #     plate_type: "flat_bottom_96well"
-  #   comment: Place plate lid on lid nest 2
+  - name: Remove lid     # WORKS
+    node: platecrane_poly
+    action: remove_lid
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Solo.Position2"
+      target: "LidNest1"
+    comment: Place plate lid on lid nest 2
 
-  # - name: Move platecrane to Safe location
-  #   module: platecrane
-  #   action: move_safe
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Move platecrane out of the way of SOLO arm
+  - name: Move platecrane to Safe location   # WORKS
+    node: platecrane_poly
+    action: move
+    locations:
+      target: "Safe"
+    comment: Move platecrane out of the way of SOLO arm
 
-  # - name: Refill Tips
-  #   module: solo
-  #   action: refill_tips
-  #   args:
-  #     position: $tip_box_position
-  #   checks: null
-  #   comment: Reset Tip Box Number to 96 Tips
+  - name: Refill Tips
+    node: solo_sam
+    action: refill_tips
+    args:
+      position: $tip_box_position
+    comment: Reset Tip Box Number to 96 Tips
 
-  #  # STEP 1
-  # - name: Mix Reactions
-  #   module: solo
-  #   action: run_protocol
-  #   args:
-  #     hso_contents: $hso_1
-  #     hso_num_lines: $hso_1_lines
-  #     hso_basename: $hso_1_basename
-  #   checks: RESOURCE_CHECK
-  #   comment: resource check not implemented, but will be
+   # STEP 1
+  - name: Mix Reactions
+    node: solo_sam
+    action: run_protocol
+    files:
+      protocol_file: $protocol_file
+    comment: resource check not implemented, but will be
 
-  # - name: Open Hidex
-  #   module: hidex
-  #   action: open
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Open Hidex Gate
+  - name: Open Hidex  # WORKS
+    node: hidex_howard
+    action: open
+    comment: Open Hidex Gate
 
-  # - name: Move plate from Solo Position2 to Hidex Nest
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Solo.Position2"
-  #     target: "Hidex.Nest"
-  #     plate_type: "flat_bottom_96well"
-  #     height_offset: 8
-  #   checks: null
-  #   comment: Place plate to Hidex Nest
+  - name: Move plate from Solo Position2 to Hidex Nest
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Solo.Position2"
+      target: "Hidex.Nest"
+    comment: Place plate to Hidex Nest
 
-  # - name: Close Hidex
-  #   module: hidex
-  #   action: close
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Close Hidex Gate
+  - name: Close Hidex   # WORKS
+    node: hidex_howard
+    action: close
+    comment: Close Hidex Gate
 
-  # - name: Open Hidex
-  #   module: hidex
-  #   action: open
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Open Hidex Gate
+  - name: Open Hidex    # WORKS
+    node: hidex_howard
+    action: open
+    comment: Open Hidex Gate
 
-  # - name: Move plate from Hidex.Nest to Sealer
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Hidex.Nest"
-  #     target: "Sealer.Nest"
-  #     plate_type: "flat_bottom_96well"
-  #     height_offset: 8
-  #   checks: null
-  #   comment: Place plate to Sealer
+  - name: Move plate from Hidex.Nest to Sealer  # WORKS
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Hidex.Nest"
+      target: "Sealer.Nest"
+    comment: Place plate to Sealer
 
-  # - name: Close Hidex
-  #   module: hidex
-  #   action: close
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Close Hidex Gate
+  - name: Close Hidex   # WORKS
+    node: hidex_howard
+    action: close
+    comment: Close Hidex Gate
 
-  # - name: Seal plate
-  #   module: sealer
-  #   action: seal
-  #   args:
-  #     time: 3  # test do I need to pass this in?
-  #     temperature: 175
-  #   checks: null
-  #   comment: Seal the plate
+  - name: Seal plate  # WORKS
+    node: sealer_harp
+    action: seal
+    comment: Seal the plate
 
-  # - name: Move plate from Sealer to Liconic
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Sealer.Nest"
-  #     target: "Liconic.Nest"
-  #     plate_type: "flat_bottom_96well"
-  #   checks: null
-  #   comment: Place plate onto Liconic
+  - name: Move plate from Sealer to Liconic   # WORKED - Why with air off?
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Sealer.Nest"
+      target: "Liconic.Nest"
+    comment: Place plate onto Liconic
 
-  # # - name: Load Liconic
-  # #   module: liconic
-  # #   action: load_plate
-  # #   args:
-  # #     plate_id: "1"
-  # #   checks: null
-  # #   comment: Load assay plate into Liconic
+  - name: Load Liconic   # WORKS
+    node: liconic_lisa
+    action: load_plate
+    args:
+      plate_id: "1"
+    comment: Load assay plate into Liconic
 
-  # # - name: Start shaker at set speed
-  # #   module: liconic
-  # #   action: begin_shake
-  # #   args:
-  # #     shaker_speed: $shaker_speed
-  # #   checks: null
-  # #   comment: Stage pcr plates
+  - name: Start shaker at set speed   # WORKS
+    node: liconic_lisa
+    action: begin_shake
+    args:
+      shaker_speed: $shaker_speed
+    comment: Stage pcr plates
 
-  # # - name: Unload Liconic
-  # #   module: liconic
-  # #   action: unload_plate
-  # #   args:
-  # #     plate_id: "1"
-  # #   checks: null
-  # #   comment: Stage pcr plates
+  - name: Unload Liconic    # WORKS
+    node: liconic_lisa
+    action: unload_plate
+    args:
+      plate_id: "1"
+    comment: Stage pcr plates
 
-  # - name: Move plate from Liconic to Peeler
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Liconic.Nest"
-  #     target: "Peeler.Nest"
-  #     plate_type: "flat_bottom_96well"
-  #   checks: null
-  #   comment: Place plate onto PeelerNest
+  - name: Move plate from Liconic to Peeler   # WORKS
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Liconic.Nest"
+      target: "Peeler.Nest"
+    comment: Place plate onto PeelerNest
 
-  # - name: Peel
-  #   module: peeler
-  #   action: peel
-  #   args:
-  #     test: null
-  #   checks: null
-  #   comment: null
+  - name: Peel  # WORKS
+    node: peeler_potato
+    action: peel
+    comment: null
 
-  # - name: Open Hidex
-  #   module: hidex
-  #   action: open
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Open Hidex Gate
+  - name: Open Hidex    # WORKS
+    node: hidex_howard
+    action: open
+    comment: Open Hidex Gate
 
-  # - name: Move plate from Peeler.Nest to Hidex.Nest
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Peeler.Nest"
-  #     target: "Hidex.Nest"
-  #     plate_type: "flat_bottom_96well"
-  #     height_offset: 8
-  #   checks: Transfer assay plate from Peeler to Hidex
-  #   comment: Place plate in Hidex Nest
+  - name: Move plate from Peeler.Nest to Hidex.Nest  # WORKS
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Peeler.Nest"
+      target: "Hidex.Nest"
+    comment: Place plate in Hidex Nest
 
-  # - name: Close Hidex
-  #   module: hidex
-  #   action: close
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Close Hidex Gate
+  - name: Close Hidex   # WORKS
+    node: hidex_howard
+    action: close
+    comment: Close Hidex Gate
 
-  # - name: Open Hidex
-  #   module: hidex
-  #   action: open
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Open Hidex Gate
+  - name: Open Hidex    # WORKS
+    node: hidex_howard
+    action: open
+    comment: Open Hidex Gate
 
-  # - name: Move plate from HidexNest to Stack1
-  #   module: platecrane
-  #   action: transfer
-  #   args:
-  #     source: "Hidex.Nest"
-  #     target: "Stack5"
-  #     plate_type: "flat_bottom_96well"
-  #     height_offset: 8
-  #   checks: null
-  #   comment: Place plate into trash Stack
+  - name: Move plate from HidexNest to Stack1  # WORKS
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Hidex.Nest"
+      target: "Stack5"
+    comment: Place plate into trash Stack
 
-  # - name: Close Hidex
-  #   module: hidex
-  #   action: close
-  #   args:
-  #     foo: "bar"
-  #   checks: null
-  #   comment: Close Hidex Gate
+  - name: Close Hidex   # WORKS
+    node: hidex_howard
+    action: close
+    comment: Close Hidex Gate
 
 
