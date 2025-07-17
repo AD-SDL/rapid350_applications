@@ -1,0 +1,18 @@
+name: Growth Curve (Workcell Setup) - Workflow
+
+metadata:
+  author: Casey Stone, Abraham Stroka
+  info: Demonstration Workflow for BIO350 Workcell
+  version: 0.1
+
+# Q: Do I need a parameters section even though I'm not using them?
+
+steps:
+  - name: run Hidex
+    node: hidex_howard
+    action: run_assay
+    args:
+      assay_name: "SetTemp37"
+      wait_for_result: false
+    comment: Preheat the Hidex to 37C
+
