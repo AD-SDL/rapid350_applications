@@ -87,15 +87,12 @@ steps:
       assay_result: T0_result
     comment: Run protocol at hidex_howard
 
-  - name: Open hidex_howard     # EDITED UNTIL HERE!
+  - name: Open hidex_howard     
     node: hidex_howard
     action: open
-    args:
-      foo: "bar"
-    checks: null
     comment: Open hidex_howard Gate
 
-  - name: Move plate from hidex_howard.Nest to Sealer
+  - name: Move plate from Hidex.Nest to Sealer  # EDITED UNTIL HERE!
     node: platecrane_poly
     action: transfer
     args:

@@ -37,7 +37,6 @@ class MultiPlateAMPExperimentApplication(ExperimentApplication):
         # extract run_id. # TODO how?
         experiment_id = self.Experiment.experiment_id  # TEST THIS
 
-
         # workflow paths
         workcell_setup_wf = workflow_directory / "workcell_setup.yaml"
         refill_tips_wf = workflow_directory / "refill_tips.yaml"
