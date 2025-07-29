@@ -1,0 +1,36 @@
+name: Demo - Workflow
+
+metadata:
+  author: Casey Stone, Abraham Stroka
+  info: Demonstration Workflow for BIO350 Workcell
+  version: 0.1
+
+# modules:
+#   - name: solo_sam
+#   - name: platecrane_poly
+#   - name: hidex_howard
+#   - name: sealer_harp
+#   - name: peeler_potato
+#   - name: liconic_lisa
+
+parameters:
+  - name: tip_box_position
+  - name: protocol_file
+  - name: shaker_speed
+  - name: seal_time
+
+steps:
+  - name: Refill Tips
+    node: solo_sam
+    action: refill_tips
+    args:
+      position: $tip_box_position
+    comment: Reset Tip Box Number to 96 Tips
+
+   # STEP 1
+  - name: Mix Reactions
+    node: solo_sam
+    action: run_protocol
+    files:
+      protocol_file: $protocol_file
+    comment: resource check not implemented, but will be
