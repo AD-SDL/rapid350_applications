@@ -7,7 +7,7 @@ from madsci.client.experiment_application import ExperimentApplication
 from pathlib import Path
 
 from helper_functions.hso_functions import package_hso
-from protocols import dispense_DMSO
+from protocols import dispense_DMSO, dispense_control_and_test, serial_dilute_test_compound
 
 class DionExperimentApplication(ExperimentApplication):
     """Experiment application for Dion's LDRD experiment"""
@@ -35,21 +35,45 @@ class DionExperimentApplication(ExperimentApplication):
             "seal_time": 3, # an integer value setting the time in seconds for the sealer to seal a plate
         }
 
-        # generate and format SOLO hso protocol, then add to parameters dict
+        # generate SOLO protocol: dispense DMSO into dilution column wells
         hso_1, hso_1_lines, hso_1_basename = package_hso(
             dispense_DMSO.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp1.hso"
         )
-        # parameters["hso_1"] = hso_1
-        # parameters["hso_1_lines"] = hso_1_lines
-        # parameters["hso_1_basename"] = hso_1_basename
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"
 
-
-        # run the SOLO workflow: dispense DMSO into dilution column wells
+        # run SOLO protocol: dispense DMSO into dilution column wells   # WORKING
         self.workcell_client.submit_workflow(
             workflow = run_solo_wf,
             parameters=parameters
         )
+
+        # generate SOLO protocol: dispense control and test compounds
+        hso_2, hso_2_lines, hso_2_basename = package_hso(
+            dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp2.hso"
+        )
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp2.hso"
+
+        # run SOLO protocol: dispense control and test compounds   # NOT TESTED
+        self.workcell_client.submit_workflow(
+            workflow = run_solo_wf,
+            parameters=parameters
+        )
+
+        # generate SOLO protocol: serial dilute test compound
+        hso_3, hso_3_lines, hso_3_basename = package_hso(
+            serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
+        )
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp3.hso"
+
+        # run SOLO protocol: serial dilute test compound   # NOT TESTED
+        self.workcell_client.submit_workflow(
+            workflow = run_solo_wf,
+            parameters=parameters
+        )
+
+
+
+
 
 
 if __name__ == "__main__":

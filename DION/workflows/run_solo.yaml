@@ -5,13 +5,6 @@ metadata:
   info: Demonstration Workflow for BIO350 Workcell
   version: 0.1
 
-# modules:
-#   - name: solo_sam
-#   - name: platecrane_poly
-#   - name: hidex_howard
-#   - name: sealer_harp
-#   - name: peeler_potato
-#   - name: liconic_lisa
 
 parameters:
   - name: tip_box_position
