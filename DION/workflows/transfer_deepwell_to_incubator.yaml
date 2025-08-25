@@ -1,0 +1,57 @@
+name: Transfer deepwell to incubator - Workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to transfer deepwell to incubator
+  version: 0.1
+
+parameters:
+  - name: tip_box_position
+  - name: protocol_file
+  - name: shaker_speed
+  - name: seal_time
+
+steps:
+  # place sterile lid on deep well plate (Can I just seal???)
+  - name: Transfer deepwell to sealer
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
+      height_offset: 8   # TODO: or change the height offset!!!
+    locations:
+      source: "Solo.Position1"
+      target: "Sealer.Nest"
+    comment: Place deepwell plate on sealer
+
+  - name: Seal plate  
+    node: sealer_harp
+    action: seal
+    comment: Seal the plate
+
+  # transfer deepwell to incubator
+  - name: Transfer deepwell to liconic
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
+      height_offset: 8   # TODO: or change the height offset!!!
+    locations:
+      source: "Sealer.Nest"
+      target: "Liconic.Nest"
+    comment: Place deepwell plate on incubator
+
+  # load incubator. (TODO: HOW TO LOAD DEEPWELL PLATES - NEED TO MAKE CHANGES TO LICONIC MODULE)
+  - name: Load Liconic   
+    node: liconic_lisa
+    action: load_plate
+    args:
+      plate_id: "1"
+    comment: Load assay plate into Liconic
+
+  - name: Start shaker at set speed  # Q: Does shaking speed need to be different for deepwell plates
+    node: liconic_lisa
+    action: begin_shake
+    args:
+      shaker_speed: $shaker_speed
+    comment: Stage pcr plates

@@ -5,9 +5,16 @@ from madsci.common.types.workflow_types import WorkflowDefinition
 from madsci.common.types.step_types import StepDefinition
 from madsci.client.experiment_application import ExperimentApplication
 from pathlib import Path
+import time
 
 from helper_functions.hso_functions import package_hso
-from protocols import dispense_DMSO, dispense_control_and_test, serial_dilute_test_compound
+from protocols import (
+    dispense_DMSO, 
+    dispense_control_and_test, 
+    serial_dilute_test_compound, 
+    dispense_cells_then_compound, 
+    exposure_to_indicator, 
+)
 
 class DionExperimentApplication(ExperimentApplication):
     """Experiment application for Dion's LDRD experiment"""
@@ -23,6 +30,13 @@ class DionExperimentApplication(ExperimentApplication):
 
         # workflow path(s)
         run_solo_wf = self.workflow_directory / "run_solo.yaml"
+        transfer_deelwell_to_incubator_wf = self.workflow_directory / "transfer_deepwell_to_incubator.yaml"
+        transfer_deepwell_to_SOLO_wf = self.workflow_directory / "transfer_deepwell_to_SOLO.yaml"
+        get_new_384_well_plate_wf = self.workflow_directory / "get_new_384_well_plate.yaml"
+
+        # other variables 
+        exposure_incubation_time = 5400 # 5400 seconds = 90 min
+    
 
         # initial payload
         parameters = {
@@ -35,41 +49,112 @@ class DionExperimentApplication(ExperimentApplication):
             "seal_time": 3, # an integer value setting the time in seconds for the sealer to seal a plate
         }
 
-        # generate SOLO protocol: dispense DMSO into dilution column wells
+        # run SOLO protocol: dispense DMSO into dilution column wells. # WORKING
         hso_1, hso_1_lines, hso_1_basename = package_hso(
             dispense_DMSO.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp1.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"
-
-        # run SOLO protocol: dispense DMSO into dilution column wells   # WORKING
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"  
         self.workcell_client.submit_workflow(
             workflow = run_solo_wf,
             parameters=parameters
         )
 
-        # generate SOLO protocol: dispense control and test compounds
+        # run SOLO protocol: dispense control and test compounds.  # NOT TESTED
         hso_2, hso_2_lines, hso_2_basename = package_hso(
             dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp2.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp2.hso"
-
-        # run SOLO protocol: dispense control and test compounds   # NOT TESTED
         self.workcell_client.submit_workflow(
             workflow = run_solo_wf,
             parameters=parameters
         )
 
-        # generate SOLO protocol: serial dilute test compound
+        # run SOLO protocol: serial dilute test compound.   # NOT TESTED
         hso_3, hso_3_lines, hso_3_basename = package_hso(
             serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp3.hso"
-
-        # run SOLO protocol: serial dilute test compound   # NOT TESTED
         self.workcell_client.submit_workflow(
             workflow = run_solo_wf,
             parameters=parameters
         )
+
+        # run SOLO protocol: dispense cells then diluted copound into exposure wells (col 1,2,3)   # NOT TESTED
+        hso_4, hso_4_lines, hso_4_basename = package_hso(
+            dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
+        )
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp4.hso"
+        self.workcell_client.submit_workflow(
+            workflow = run_solo_wf,
+            parameters=parameters
+        )
+
+        # run workflow: (place sterile lid on exposure plate and incubate).  # NOT TESTED
+            # Q: Can we just seal instead of using a sterile lid? 
+        self.workcell_client.submit_workflow(
+            workflow = transfer_deelwell_to_incubator_wf, 
+            parameters = parameters
+        )
+
+        # incubate at 37C for 90 min
+        time.sleep(exposure_incubation_time)
+
+        # run workflow: unload exposure plate from incubator and return to SOLO deck 1.  # NOT TESTED
+        self.workcell_client.submit_workflow(
+            workflow = transfer_deelwell_to_incubator_wf, 
+            parameters = parameters
+        )
+
+        # run SOLO protocol: transfer all contents of exposure wells to indicator wells. # NOT TESTED
+        hso_5, hso_5_lines, hso_5_basename = package_hso(
+            exposure_to_indicator.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp5.hso"
+        )
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp5.hso"
+        self.workcell_client.submit_workflow(
+            workflow = run_solo_wf,
+            parameters=parameters
+        )
+
+        # BEGIN LOOP: LOOP THREE TIMES HERE - create 384 well plate!
+
+        # Transfer a new 384 well plate from stack 1(?) to solo position 2. # NOT TESTED 
+        self.workcell_client.submit_workflow(
+            workflow = get_new_384_well_plate_wf,
+            parameters=parameters
+        )
+
+        # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+        # TODO: How to transfer into 384 well plate again???
+
+        # run workflow: move 384 well plate to incubator (replacing lid)
+
+        # END LOOP
+
+        # Incubate all 3 384 well plates overnight (48 hours, no shaking, 37C)
+
+        # BEGIN LOOP: take each plate out and read one at a time then place in trash stack
+
+        # run workflow: remove a 384 plate from incubator, remove lid, and read in hidex, then replace lid and move to trash stack
+
+        
+
+
+
+
+        # END LOOP
+
+
+
+
+
+
+
+
+
+        
+        
+
+
 
 
 

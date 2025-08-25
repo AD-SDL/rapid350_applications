@@ -54,8 +54,8 @@ def generate_hso_file(
     # TODO: check that 240 is good, how much could we transfer? <- TEST
 
     # mix variables
-    mix_cycles = 5
-    mix_volume = 150
+    mix_cycles = 10
+    mix_volume = 80
 
     # ACTIONS
     # 1. Dispense all contents of exposure columns (1,2, and 3) into each well of indicator columns (1,2, and 3)
@@ -68,6 +68,10 @@ def generate_hso_file(
                     exposure_columns[i], half_total_transfer_volume
                 ),
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
+                mix_at_start = True, 
+                mix_cycles = mix_cycles, 
+                mix_volume = mix_volume, 
+                dispense_height = flat_bottom_z_shift,
             )
             soloSoft.dispense(
                 position=exposure_indiacator_plate_location,
@@ -75,6 +79,10 @@ def generate_hso_file(
                     indicator_columns[i], half_total_transfer_volume
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],
+                mix_at_finish = True, 
+                mix_cycles = mix_cycles, 
+                mix_volume = mix_volume,
+                aspirate_height = flat_bottom_z_shift,
             )
     soloSoft.shuckTip()
 

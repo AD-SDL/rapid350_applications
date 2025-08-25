@@ -59,7 +59,7 @@ def generate_hso_file(
     dilution_transfer_volume = 10   # 10uL 
 
     # mix variables
-    mix_cycles = 5
+    mix_cycles = 10
     mix_volume = 150
 
     # ACTIONS
