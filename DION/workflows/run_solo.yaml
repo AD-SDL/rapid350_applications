@@ -5,7 +5,6 @@ metadata:
   info: Workflow to run a SOLO protocol
   version: 0.1
 
-
 parameters:
   - name: tip_box_position
   - name: protocol_file
