@@ -14,6 +14,7 @@ from protocols import (
     serial_dilute_test_compound, 
     dispense_cells_then_compound, 
     exposure_to_indicator, 
+    dispense_into_384_plate
 )
 
 class DionExperimentApplication(ExperimentApplication):
@@ -33,9 +34,12 @@ class DionExperimentApplication(ExperimentApplication):
         transfer_deelwell_to_incubator_wf = self.workflow_directory / "transfer_deepwell_to_incubator.yaml"
         transfer_deepwell_to_SOLO_wf = self.workflow_directory / "transfer_deepwell_to_SOLO.yaml"
         get_new_384_well_plate_wf = self.workflow_directory / "get_new_384_well_plate.yaml"
+        transfer_384_to_incubator_wf = self.workflow_directory / "transfer_384_to_incubator.yaml"
+        read_then_trash_384_well_plate_wf = self.workflow_directory / "read_then_trash_384_well_plate.yaml"
 
         # other variables 
         exposure_incubation_time = 5400 # 5400 seconds = 90 min
+        micoplate_incubation_time = 172800 # 172800 seconds = 48 hours
     
 
         # initial payload
@@ -101,7 +105,7 @@ class DionExperimentApplication(ExperimentApplication):
 
         # run workflow: unload exposure plate from incubator and return to SOLO deck 1.  # NOT TESTED
         self.workcell_client.submit_workflow(
-            workflow = transfer_deelwell_to_incubator_wf, 
+            workflow = transfer_deepwell_to_SOLO_wf, 
             parameters = parameters
         )
 
@@ -116,48 +120,53 @@ class DionExperimentApplication(ExperimentApplication):
         )
 
         # BEGIN LOOP: LOOP THREE TIMES HERE - create 384 well plate!
+        for i in range(3):
+            microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
+            parameters["microplate_id"] = str(microplate_id)
 
-        # Transfer a new 384 well plate from stack 1(?) to solo position 2. # NOT TESTED 
-        self.workcell_client.submit_workflow(
-            workflow = get_new_384_well_plate_wf,
-            parameters=parameters
-        )
+            # Transfer a new 384 well plate from stack 1(?) to solo position 2. # NOT TESTED 
+            self.workcell_client.submit_workflow(
+                workflow = get_new_384_well_plate_wf,
+                parameters=parameters
+            )
 
-        # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
-        # TODO: How to transfer into 384 well plate again???
+            # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+            solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+5}.hso"
+            hso_6, hso_6_lines, hso_6_basename = package_hso(
+                dispense_into_384_plate.generate_hso_file, 
+                payload=parameters, 
+                temp_file_path=solo_temp_filename,
+                current_indicator_column = i + 4  # indicator columns are 4, 5, and 6
+            )
+            parameters["protocol_file"] = solo_temp_filename
+            self.workcell_client.submit_workflow(
+                workflow = run_solo_wf,
+                parameters=parameters
+            )
 
-        # run workflow: move 384 well plate to incubator (replacing lid)
+            # run workflow: move 384 well plate to incubator (replacing lid)
+            self.workcell_client.submit_workflow(
+                workflow = transfer_384_to_incubator_wf,
+                parameters=parameters
+            )
 
-        # END LOOP
+        # END LOOP: all three microplates are in incubator and shaking
 
         # Incubate all 3 384 well plates overnight (48 hours, no shaking, 37C)
+        time.sleep(micoplate_incubation_time)
 
         # BEGIN LOOP: take each plate out and read one at a time then place in trash stack
+        for i in range(3):
+            microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
+            parameters["microplate_id"] = str(microplate_id)
 
-        # run workflow: remove a 384 plate from incubator, remove lid, and read in hidex, then replace lid and move to trash stack
+            # run workflow: remove a 384 plate from incubator, remove lid, and read in hidex, then replace lid and move to trash stack
+            self.workcell_client.submit_workflow(
+                workflow = read_then_trash_384_well_plate_wf,
+                parameters=parameters
+            )
 
-        
-
-
-
-
-        # END LOOP
-
-
-
-
-
-
-
-
-
-        
-        
-
-
-
-
-
+        # END LOOP: all 384 well microplates read and in trash stack
 
 
 

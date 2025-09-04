@@ -49,7 +49,7 @@ steps:
       plate_id: "1"
     comment: Load assay plate into Liconic
 
-  - name: Start shaker at set speed  # Q: Does shaking speed need to be different for deepwell plates
+  - name: Start shaker at set speed  # Q: what should the shaking speed be for the microplates? Different than deepwell?
     node: liconic_lisa
     action: begin_shake
     args:

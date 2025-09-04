@@ -10,43 +10,38 @@ parameters:
   - name: protocol_file
   - name: shaker_speed
   - name: seal_time
+  - name: microplate_id   # id for the 384 well plate to be loaded into incubator
 
 steps:
-  # place sterile lid on deep well plate (Can I just seal???)
-  - name: Transfer deepwell to sealer
+  # replace lid on 384 well plate
+  - name: Replace lid    
     node: platecrane_poly
-    action: transfer
+    action: replace_lid
     args:
-      plate_type: "flat_bottom_96well" 
-      height_offset: 8   
+      plate_type: "flat_bottom_96well"   # actually a 384 well plate but this def should be fine
     locations:
       source: "Solo.Position2"
-      target: "Sealer.Nest"
-    comment: Place deepwell plate on sealer
+      target: "LidNest1"
+    comment: Place plate lid on lid nest 2
 
-  - name: Seal plate  
-    node: sealer_harp
-    action: seal
-    comment: Seal the plate
-
-  # transfer deepwell to incubator
+  # transfer 384 well plate to incubator
   - name: Transfer deepwell to liconic
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
-      height_offset: 8   # TODO: or change the height offset!!!
+      plate_type: "flat_bottom_96well"  # again, this should be fine for 384 well plate
+      height_offset: 8   
     locations:
-      source: "Sealer.Nest"
+      source: "Solo.Position2"
       target: "Liconic.Nest"
-    comment: Place deepwell plate on incubator
+    comment: Place 384 well plate on incubator nest
 
-  # load incubator. (TODO: HOW TO LOAD DEEPWELL PLATES - NEED TO MAKE CHANGES TO LICONIC MODULE)
+  # load incubator. (TODO: HOW TO LOAD MICROPLATES?? - I suppose they could be loaded to either side of the incubator)
   - name: Load Liconic   
     node: liconic_lisa
     action: load_plate
     args:
-      plate_id: "1"
+      plate_id: $microplate_id
     comment: Load assay plate into Liconic
 
   - name: Start shaker at set speed  # Q: Does shaking speed need to be different for deepwell plates
@@ -55,3 +50,4 @@ steps:
     args:
       shaker_speed: $shaker_speed
     comment: Stage pcr plates
+ 
