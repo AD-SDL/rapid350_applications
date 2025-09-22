@@ -35,7 +35,7 @@ def generate_hso_file(
         filename=temp_file_path,
         plateList=[
             "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "Biorad 384 well (HSP3905)",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -52,7 +52,7 @@ def generate_hso_file(
     control_transfer_volume = 200  # Volume of control compound to transfer into dilution column wells
 
     test_stock_location = "Position4"  # Location of the test stock plate
-    test_stock_row = "B"  # Row in the test stock plate containing test compound
+    test_stock_row = "A"  # Row in the test stock plate containing test compound
     test_stock_column = 3  # Column in the test stock plate containing test compound
     test_compound_volume = 200  # Test compound volumes for each well in column 1
 
@@ -63,40 +63,45 @@ def generate_hso_file(
 
     # ACTIONS
     # 1. Dispense control compound into dilution plate, well in row A
+
+    # TODO: Do I need a new tip for each half volume transfer?
+    # TODO: What are the correct control and test stock locations: rows, and columns?
+
     soloSoft.getTip("Position5", num_tips=1)
-    soloSoft.aspirate(
-        position=control_stock_location,
-        aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
-            control_stock_row, control_stock_column, control_transfer_volume
-        ),
-        aspirate_shift=[0, 0, flat_bottom_z_shift],
-    )
-    soloSoft.dispense(
-        position=dilution_plate_location,
-        dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
-            rows[0], dilution_column, control_transfer_volume
-        ),
-        dispense_shift=[0, 0, flat_bottom_z_shift],
-    )
+    for i in range(2):
+        soloSoft.aspirate(
+            position=control_stock_location,
+            aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+                control_stock_row, control_stock_column, (control_transfer_volume/2)
+            ),
+            aspirate_shift=[0, 0, flat_bottom_z_shift],
+        )
+        soloSoft.dispense(
+            position=dilution_plate_location,
+            dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+                rows[0], dilution_column, (control_transfer_volume/2)
+            ),
+            dispense_shift=[0, 0, flat_bottom_z_shift],
+        )
     soloSoft.shuckTip()
 
     # 2. Dispense test compound into dilution plate, well in row B
     soloSoft.getTip("Position5", num_tips=1)
-    soloSoft.aspirate(
-        position=test_stock_location,
-        aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
-            test_stock_row, test_stock_column, test_compound_volume
-        ),
-        aspirate_shift=[0, 0, flat_bottom_z_shift],
-    )
-    soloSoft.dispense(
-        position=dilution_plate_location,
-        dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
-            rows[1], dilution_column, test_compound_volume
-        ),
-        dispense_shift=[0, 0, flat_bottom_z_shift],
-    )
+    for i in range(2):
+        soloSoft.aspirate(
+            position=test_stock_location,
+            aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+                test_stock_row, test_stock_column, (test_compound_volume/2)
+            ),
+            aspirate_shift=[0, 0, flat_bottom_z_shift],
+        )
+        soloSoft.dispense(
+            position=dilution_plate_location,
+            dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+                rows[1], dilution_column, (test_compound_volume/2)
+            ),
+            dispense_shift=[0, 0, flat_bottom_z_shift],
+        )
     soloSoft.shuckTip()
-
 
     soloSoft.savePipeline()

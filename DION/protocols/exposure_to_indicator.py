@@ -6,7 +6,7 @@ from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
 
 # TODO: edit z height for deepwell, not flat bottom
-# TODO: Custom plate def for 48 deepwell 
+# TODO: Custom plate def for 48 deepwell
 # TODO: Clean up and document
 
 # SOLO PROTOCOL STEPS
@@ -17,8 +17,8 @@ def generate_hso_file(
     """generate_hso_file
 
     Description:
-        Dispenses 50ul from one indicator column into each well of a 384 well plate. 
-        Repeats for the other two indicator columns into new 384 well plates. 
+        Dispenses 50ul from one indicator column into each well of a 384 well plate.
+        Repeats for the other two indicator columns into new 384 well plates.
 
     Args:
         payload (dict): input variables from the wei workflow (not used in demo)
@@ -34,7 +34,7 @@ def generate_hso_file(
         filename=temp_file_path,
         plateList=[
             "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "Biorad 384 well (HSP3905)",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -48,7 +48,7 @@ def generate_hso_file(
     exposure_indiacator_plate_location = "Position1"
     exposure_columns = [1,2,3]
     indicator_columns = [4,5,6]
-    total_transfer_volume = 240 
+    total_transfer_volume = 240
     half_total_transfer_volume = total_transfer_volume / 2
     # NOTE: want to transfer total volume (250uL) but can't with robots
     # TODO: check that 240 is good, how much could we transfer? <- TEST
@@ -68,9 +68,9 @@ def generate_hso_file(
                     exposure_columns[i], half_total_transfer_volume
                 ),
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
-                mix_at_start = True, 
-                mix_cycles = mix_cycles, 
-                mix_volume = mix_volume, 
+                mix_at_start = True,
+                mix_cycles = mix_cycles,
+                mix_volume = mix_volume,
                 dispense_height = flat_bottom_z_shift,
             )
             soloSoft.dispense(
@@ -79,8 +79,8 @@ def generate_hso_file(
                     indicator_columns[i], half_total_transfer_volume
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],
-                mix_at_finish = True, 
-                mix_cycles = mix_cycles, 
+                mix_at_finish = True,
+                mix_cycles = mix_cycles,
                 mix_volume = mix_volume,
                 aspirate_height = flat_bottom_z_shift,
             )

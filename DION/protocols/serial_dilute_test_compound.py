@@ -5,7 +5,8 @@ Generates SOLO .hso instruction file for first set of steps for substrate transf
 from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
 
-# TODO: should I mix?
+
+# TODO: Should I be getting a new tip for each transfer?
 
 
 # SOLO PROTOCOL STEPS
@@ -35,7 +36,7 @@ def generate_hso_file(
         filename=temp_file_path,
         plateList=[
             "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "Biorad 384 well (HSP3905)",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -57,7 +58,7 @@ def generate_hso_file(
     # ACTIONS
     # serial dilute test compond into dilution plate, wells in row B->G, using same tip, and mix
     soloSoft.getTip("Position5", num_tips=1)
-    for i in range(1, 7):
+    for i in range(1, 6):
         soloSoft.aspirate(
             position=dilution_plate_location,
             aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(

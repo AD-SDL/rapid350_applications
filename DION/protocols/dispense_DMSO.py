@@ -3,7 +3,7 @@ Generates SOLO .hso instruction file for first set of steps for substrate transf
 
 """
 from liquidhandling import SoloSoft
-from liquidhandling import Reservoir_12col_Agilent_201256_100_BATSgroup, DeepBlock_96VWR_75870_792_sterile
+from liquidhandling import DeepBlock_96VWR_75870_792_sterile
 
 
 # SOLO PROTOCOL STEPS
@@ -33,19 +33,21 @@ def generate_hso_file(
         filename=temp_file_path,
         plateList=[
             "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "Biorad 384 well (HSP3905)",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
             "DeepBlock.96.VWR-75870-792.sterile",       # cells stock plate
             "Empty",
-            "Empty",    
+            "Empty",
         ],
     )
 
     dmso_stock_location = "Position4"  # Location of the DMSO stock plate
     dmso_stock_column = 1  # Column in the substrate stock plate containing DMSO
-    dmso_uL_volumes = [0, 0, 63.3, 63.3, 63.3, 63.3, 63.3, 200]  # DMSO volumes for each well in column 1
+    dmso_uL_volumes = [0, 0, 136.7, 136.7, 136.7, 136.7, 136.7, 200]  # DMSO volumes for each well in column 1
+
+    # TODO: Are these volumes correct?
 
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
@@ -54,19 +56,17 @@ def generate_hso_file(
 
     # ACTIONS
     # 1. Dispense DMSO into each well of dilution column with single channel transfers
+
+    # TODO: what is the DMSO source well? Right now I'm assuming a deepwell plate with all column 1 filled with DMSO
+
+    soloSoft.getTip("Position5", num_tips=1)  # same tip for all transfers
     for i in range(len(dmso_uL_volumes)):
-
-        # TODO: maybe take out redundant tip shucking
-        # TODO: convert to single well transfers!!!! How to specify well?
-        # TODO: Should I use the same tip for all transfers?  - probably
-
         if dmso_uL_volumes[i] > 0:
             if dmso_uL_volumes[i] > 180:
                 # do two transfers of half the volume, same tip for both transfers
                 # Note: this is a workaround for the 180 uL tip box limitation
                 transfer_volume = dmso_uL_volumes[i] / 2
-                soloSoft.getTip("Position5", num_tips=1)
-                for i in range(2):
+                for j in range(2):
                     # TODO: Are we aspirating from the same row each time?
                     soloSoft.aspirate(
                         position=dmso_stock_location,
@@ -82,9 +82,7 @@ def generate_hso_file(
                         ),
                         dispense_shift=[0, 0, flat_bottom_z_shift],
                     )
-                soloSoft.shuckTip()
             else:  # transfer all volume in one go
-                soloSoft.getTip("Position5", num_tips=1)
                 soloSoft.aspirate(
                     position=dmso_stock_location,
                     aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
@@ -99,7 +97,6 @@ def generate_hso_file(
                     ),
                     dispense_shift=[0, 0, flat_bottom_z_shift],
                 )
-                soloSoft.shuckTip()
 
-
+    soloSoft.shuckTip()
     soloSoft.savePipeline()

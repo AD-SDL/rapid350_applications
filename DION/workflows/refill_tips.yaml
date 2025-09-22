@@ -12,9 +12,9 @@ parameters:
   - name: seal_time
 
 steps:
-  - name: Mix Reactions
+  - name: Refill Tips
     node: solo_sam
-    action: run_protocol
-    files:
-      protocol_file: $protocol_file
-    comment: resource check not implemented, but will be
+    action: refill_tips
+    args:
+      position: $tip_box_position
+    comment: Reset Tip Box Number to 96 Tips

@@ -6,6 +6,8 @@ from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
 
 # TODO: edit z height for deepwell, not flat bottom
+# TODO: Recalibrate SOLO position 1, pipette hitting side of deepwell when dispensing
+# TODO: do I need to define a new plate type in liquidhandling for 48 deepwell? !!!!!!!
 
 # SOLO PROTOCOL STEPS
 def generate_hso_file(
@@ -33,8 +35,8 @@ def generate_hso_file(
     soloSoft = SoloSoft(
         filename=temp_file_path,
         plateList=[
-            "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "48well_deepwell",  # exposure/indicator plate
+            "Biorad 384 well (HSP3905)",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -45,8 +47,8 @@ def generate_hso_file(
     )
 
     # stock cells plate details
-    cells_stock_location = "Position6" # ???
-    cells_stock_column = 1   # ???
+    cells_stock_location = "Position6"
+    cells_stock_column = 1    # Cell stock needs to be in each well of column 1, at least 800uL+ per well
     cells_transfer_volume = 240  # will need to do two transfers
     half_cells_transfer_volume = cells_transfer_volume / 2
 
@@ -56,7 +58,7 @@ def generate_hso_file(
     # compound serial dilutuon plate details
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
-    dilution_transfer_volume = 10   # 10uL 
+    dilution_transfer_volume = 10   # 10uL
 
     # mix variables
     mix_cycles = 10
@@ -73,9 +75,9 @@ def generate_hso_file(
                     cells_stock_column, half_cells_transfer_volume
                 ),
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
-                mix_at_start = True, 
-                mix_cycles = mix_cycles, 
-                mix_volume = mix_volume, 
+                mix_at_start = True,
+                mix_cycles = mix_cycles,
+                mix_volume = mix_volume,
                 dispense_height = flat_bottom_z_shift
             )
             soloSoft.dispense(
@@ -85,19 +87,19 @@ def generate_hso_file(
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],
             )
-    soloSoft.shuckTip()
 
     # 2. dispense 10ul serial diluted compound into exposure columns 1, 2, and 3
     for i in range(3):
+        soloSoft.getTip("Position5")
         soloSoft.aspirate(
             position=dilution_plate_location,
             aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
                 dilution_column, dilution_transfer_volume
             ),
             aspirate_shift=[0, 0, flat_bottom_z_shift],
-            mix_at_start = True, 
-            mix_cycles = mix_cycles, 
-            mix_volume = mix_volume, 
+            mix_at_start = True,
+            mix_cycles = mix_cycles,
+            mix_volume = mix_volume,
             dispense_height = flat_bottom_z_shift
         )
         soloSoft.dispense(
@@ -106,13 +108,11 @@ def generate_hso_file(
                 (i + 1), dilution_transfer_volume
             ),
             dispense_shift=[0, 0, flat_bottom_z_shift],
-            mix_at_finish = True, 
-            mix_cycles = mix_cycles, 
+            mix_at_finish = True,
+            mix_cycles = mix_cycles,
             mix_volume = mix_volume,
             aspirate_height = flat_bottom_z_shift,
         )
-  
 
-
-
+    soloSoft.shuckTip()
     soloSoft.savePipeline()
