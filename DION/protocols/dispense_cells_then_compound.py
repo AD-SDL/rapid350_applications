@@ -34,7 +34,7 @@ def generate_hso_file(
         filename=temp_file_path,
         plateList=[
             "Empty",
-            "Biorad 384 well (HSP3905)",       # assay plate
+            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box

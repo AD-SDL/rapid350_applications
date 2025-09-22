@@ -54,4 +54,4 @@ steps:
     action: begin_shake
     args:
       shaker_speed: $shaker_speed
-    comment: Stage pcr plates
+    comment: start the shaker
