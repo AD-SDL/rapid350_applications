@@ -86,6 +86,12 @@ steps:
       target: "Solo.Position2"
     comment: Place 384 well plate on Solo.Position2
 
+  # close the Hidex
+  - name: Close Hidex  
+    node: hidex_howard
+    action: close
+    comment: Close the Hidex door
+
   # Replace lid on 384 well plate
   - name: Replace lid    
     node: platecrane_poly
@@ -107,6 +113,9 @@ steps:
       source: "Solo.Position2"
       target: "Stack5"
     comment: Place plate in trash stack
+
+
+
 
 
 
