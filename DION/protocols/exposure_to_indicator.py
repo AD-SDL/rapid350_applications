@@ -17,8 +17,12 @@ def generate_hso_file(
     """generate_hso_file
 
     Description:
+<<<<<<< Updated upstream
         Dispenses 50ul from one indicator column into each well of a 384 well plate.
         Repeats for the other two indicator columns into new 384 well plates.
+=======
+         Dispenses contents of exposure wells into indicator wells.
+>>>>>>> Stashed changes
 
     Args:
         payload (dict): input variables from the wei workflow (not used in demo)

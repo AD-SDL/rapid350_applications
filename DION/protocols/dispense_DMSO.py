@@ -1,5 +1,5 @@
 """
-Generates SOLO .hso instruction file for first set of steps for substrate transfer experiment
+Generates SOLO .hso instruction file. 
 
 """
 from liquidhandling import SoloSoft
