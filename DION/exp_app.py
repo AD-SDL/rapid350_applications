@@ -144,13 +144,32 @@ class DionExperimentApplication(ExperimentApplication):
                 parameters=parameters
             )
 
-            # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+            # TESTED :)
+            # # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+            parameters["current_indicator_column"] = i + 4 # indicator columns are 4, 5, and 6
+            # first half of 384 well plate
+            parameters["half"] = 1
             solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+5}.hso"
             hso_6, hso_6_lines, hso_6_basename = package_hso(
                 dispense_into_384_plate.generate_hso_file,
                 payload=parameters,
                 temp_file_path=solo_temp_filename,
-                current_indicator_column = i + 4  # indicator columns are 4, 5, and 6
+            )
+            parameters["protocol_file"] = solo_temp_filename
+            self.workcell_client.submit_workflow(
+                workflow = run_solo_wf,
+                parameters=parameters
+            )
+
+            # TESTED :)
+            # second half of 384 well plate
+            parameters["half"] = 2
+            # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+            solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+6}.hso"
+            hso_7, hso_7_lines, hso_7_basename = package_hso(
+                dispense_into_384_plate.generate_hso_file,
+                payload=parameters,
+                temp_file_path=solo_temp_filename,
             )
             parameters["protocol_file"] = solo_temp_filename
             self.workcell_client.submit_workflow(

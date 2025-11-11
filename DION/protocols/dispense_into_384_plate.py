@@ -7,12 +7,11 @@ from liquidhandling import Plate_384_Corning_3540_BlackwClearBottomAssay, DeepBl
 def generate_hso_file(
         payload,
         temp_file_path,
-        current_indicator_column
 ):
     """generate_hso_file
 
     Description:
-         Dispenses 50uL from each well in a 96 well plate into a 384 well plate, 
+         Dispenses 50uL from each well in a 96 well plate into a 384 well plate,
          dispensing into every other well (i.e. A1, A3, A5...B1, B3, B5... etc)
 
     Args:
@@ -22,7 +21,7 @@ def generate_hso_file(
     # variables
     transfer_volume = 50
     mix_volume_at_start = 50
-    mix_volume_at_end = 50
+    # mix_volume_at_end = 50
     mix_cycles = 5
     exposure_indiacator_plate_location = "Position1"
 
@@ -31,8 +30,8 @@ def generate_hso_file(
     soloSoft = SoloSoft(
         filename=temp_file_path,
         plateList=[
-            "Empty",
-            "Plate.384.Corning-3540.BlackwClearBottomAssay",       # assay plate
+            "DeepBlock.96.VWR-75870-792.sterile",
+            "Biorad_384_well_HSP3905",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -42,44 +41,97 @@ def generate_hso_file(
         ],
     )
 
-    # ACTIONS -------------      
+    # ACTIONS -------------
         # TODO: TEST THIS!!!
-        # TODO: can we complete all transfers with one tip? 
+        # TODO: can we complete all transfers with one tip?
 
+    current_indicator_column = payload["current_indicator_column"]
+    half = payload["half"]  # 'A' or 'B' half of the 96 well plate
+
+     # pick up tip
     soloSoft.getTip("Position5")
-    for i in range(1,25):  # there are 24 columns in 384 well plate,  
-        # aspirate 100uL from indicator plate column
-        soloSoft.aspirate(
-            position=exposure_indiacator_plate_location,
-            aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
-                current_indicator_column, transfer_volume * 2
-            ),
-            aspirate_shift=[0, 0, 2],  # flat bottom z shift (# TODO: should this be different for deepwell?)
-            mix_at_start=True,
-            mix_cycles=mix_cycles,
-            mix_volume=mix_volume_at_start,
-            dispense_shift = 2,  # make sure correct here...
-        )   
-        
-        # dipsense 50uL into each well rows (A,C,E,G,I,K,M,O) of 384 well plate column i 
-        soloSoft.dispense(
-            position="Position2",
-            dispense_volumes=Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
-                i, transfer_volume
-            ),
-            dispense_shift=[0, 0, 2], 
-        )
 
-        # dispense 50uL into each well rows (B,D,F,H,J,L,N,P) of 384 well plate column i
-        dispense_volumes_startB = Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
-            i, transfer_volume
-        )
-        dispense_volumes_startB[0][0] = 0  # change value in first row to 0 -> shortcut to make soloSoft start at Row B
-        soloSoft.dispense(
-            position="Position2",
-            dispense_volumes=dispense_volumes_startB,
-            dispense_shift=[0, 0, 2]
-        )
+    plate = Plate_384_Corning_3540_BlackwClearBottomAssay()
+    print(f"plate.columns: {plate.columns}")
+
+    # aspirate and dispense into one half of the 384 well plate
+    # Note: SoloSoft will crash if too many steps are included in one file
+    if half == 1:
+        for i in range(1,13,2):  # first half of the 384 well plate
+            # aspirate 100uL from indicator plate column
+            soloSoft.aspirate(
+                position=exposure_indiacator_plate_location,
+                aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
+                    current_indicator_column, transfer_volume * 4
+                ),
+                aspirate_shift=[0, 0, 2],  # flat bottom z shift (# TODO: should this be different for deepwell?)
+                mix_at_start=True,
+                mix_cycles=mix_cycles,
+                mix_volume=mix_volume_at_start,
+                dispense_height = 2,  # make sure correct here...
+            )
+
+            for j in range(2): # two iterations to cover both columns (i and i+1)
+                # dipsense 50uL into each well rows (A,C,E,G,I,K,M,O) of 384 well plate column i
+                soloSoft.dispense(
+                    position="Position2",
+                    dispense_volumes=Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
+                        i+j, transfer_volume
+                    ),
+                    dispense_shift=[0, 0, 2],
+                )
+
+                # dispense 50uL into each well rows (B,D,F,H,J,L,N,P) of 384 well plate column i
+                dispense_volumes_startB = Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
+                    i+j, transfer_volume
+                )
+                # edit dispense volumes to start at Row B
+                dispense_volumes_startB[0][i+j-1] = 0
+
+                soloSoft.dispense(
+                    position="Position2",
+                    dispense_volumes=dispense_volumes_startB,
+                    dispense_shift=[0, 0, 2]
+                )
+
+    elif half == 2:
+        for i in range(13,25,2):  # there are 24 columns in 384 well plate,
+            # aspirate 100uL from indicator plate column
+            soloSoft.aspirate(
+                position=exposure_indiacator_plate_location,
+                aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
+                    current_indicator_column, transfer_volume * 4
+                ),
+                aspirate_shift=[0, 0, 2],  # flat bottom z shift (# TODO: should this be different for deepwell?)
+                mix_at_start=True,
+                mix_cycles=mix_cycles,
+                mix_volume=mix_volume_at_start,
+                dispense_height = 2,  # make sure correct here...
+            )
+
+            for j in range(2): # two iterations to cover both columns (i and i+1)
+                # dipsense 50uL into each well rows (A,C,E,G,I,K,M,O) of 384 well plate column i
+                soloSoft.dispense(
+                    position="Position2",
+                    dispense_volumes=Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
+                        i+j, transfer_volume
+                    ),
+                    dispense_shift=[0, 0, 2],
+                )
+
+                # dispense 50uL into each well rows (B,D,F,H,J,L,N,P) of 384 well plate column i
+                dispense_volumes_startB = Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
+                    i+j, transfer_volume
+                )
+                # edit dispense volumes to start at Row B
+                dispense_volumes_startB[0][i+j-1] = 0
+
+                soloSoft.dispense(
+                    position="Position2",
+                    dispense_volumes=dispense_volumes_startB,
+                    dispense_shift=[0, 0, 2]
+                )
+
 
     soloSoft.shuckTip()
     soloSoft.savePipeline()
