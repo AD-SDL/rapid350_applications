@@ -55,13 +55,13 @@ class DionExperimentApplication(ExperimentApplication):
             "protocol_file": "", # string file path to the hso protocol file to be run on SOLO
         }
 
-        # refill the tips at beginning of experiment run   # WORKING
+        # 1. Refill the tips at beginning of experiment run   # WORKING
         self.workcell_client.submit_workflow(
             workflow = refill_tips_wf,
             parameters=parameters
         )
 
-        # run SOLO protocol: dispense DMSO into dilution column wells. # WORKING
+        # 2. Run SOLO protocol: dispense DMSO into dilution column wells. # WORKING
         # TODO: Are these volumes correct?
         # TODO: what is the DMSO source well? Right now I'm assuming a deepwell plate with all column 1 filled with DMSO
         hso_1, hso_1_lines, hso_1_basename = package_hso(
@@ -73,7 +73,7 @@ class DionExperimentApplication(ExperimentApplication):
             parameters=parameters
         )
 
-        # run SOLO protocol: dispense control and test compounds.  # WORKING
+        # 3. Run SOLO protocol: dispense control and test compounds.  # WORKING
         # TODO: correct control and test stock locations: rows, and columns?
         hso_2, hso_2_lines, hso_2_basename = package_hso(
             dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp2.hso"
@@ -84,7 +84,7 @@ class DionExperimentApplication(ExperimentApplication):
             parameters=parameters
         )
 
-        # run SOLO protocol: serial dilute test compound.   # WORKING
+        # 4. Run SOLO protocol: serial dilute test compound.   # WORKING
         # TODO: Should I be getting a new tip for each transfer?
         hso_3, hso_3_lines, hso_3_basename = package_hso(
             serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
@@ -95,9 +95,8 @@ class DionExperimentApplication(ExperimentApplication):
             parameters=parameters
         )
 
-        # run SOLO protocol: dispense cells then diluted copound into exposure wells (col 1,2,3)   # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
+        # 5. Run SOLO protocol: dispense cells then diluted copound into exposure wells (col 1,2,3)   # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
         # TODO: edit z height for deepwell, not flat bottom
-        # TODO: Recalibrate SOLO position 1, pipette hitting side of deepwell when dispensing
         hso_4, hso_4_lines, hso_4_basename = package_hso(
             dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
         )
@@ -107,23 +106,23 @@ class DionExperimentApplication(ExperimentApplication):
             parameters=parameters
         )
 
-        # run workflow: (place sterile lid on exposure plate and incubate).  # NOT TESTED
+        # 6. Run workflow: (place sterile lid on exposure plate and incubate).  # NOT TESTED
             # Q: Can we just seal instead of using a sterile lid?
         self.workcell_client.submit_workflow(
             workflow = transfer_deelwell_to_incubator_wf,
             parameters = parameters
         )
 
-        # incubate at 37C for 90 min
+        # 7. Incubate at 37C for 90 min
         time.sleep(exposure_incubation_time)
 
-        # run workflow: unload exposure plate from incubator and return to SOLO deck 1.  # NOT TESTED
+        # 8. Run workflow: unload exposure plate from incubator and return to SOLO deck 1.  # NOT TESTED
         self.workcell_client.submit_workflow(
             workflow = transfer_deepwell_to_SOLO_wf,
             parameters = parameters
         )
 
-        # run SOLO protocol: transfer all contents of exposure wells to indicator wells. # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
+        # 9. Run SOLO protocol: transfer all contents of exposure wells to indicator wells. # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
         hso_5, hso_5_lines, hso_5_basename = package_hso(
             exposure_to_indicator.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp5.hso"
         )
@@ -138,16 +137,15 @@ class DionExperimentApplication(ExperimentApplication):
             microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
-            # Transfer a new 384 well plate from stack 1(?) to solo position 2. # NOT TESTED
+            # 10. Transfer a new 384 well plate from stack 1(?) to solo position 2. # NOT TESTED
             self.workcell_client.submit_workflow(
                 workflow = get_new_384_well_plate_wf,
                 parameters=parameters
             )
 
-            # TESTED :)
-            # # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
+            # # 11. Run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
             parameters["current_indicator_column"] = i + 4 # indicator columns are 4, 5, and 6
-            # first half of 384 well plate
+            # 11a. First half of 384 well plate
             parameters["half"] = 1
             solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+5}.hso"
             hso_6, hso_6_lines, hso_6_basename = package_hso(
@@ -162,7 +160,7 @@ class DionExperimentApplication(ExperimentApplication):
             )
 
             # TESTED :)
-            # second half of 384 well plate
+            # 11b. Second half of 384 well plate
             parameters["half"] = 2
             # run SOLO protocol: transfer 50uL from indicator wells into each well of a 384 well plate
             solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+6}.hso"
@@ -177,7 +175,7 @@ class DionExperimentApplication(ExperimentApplication):
                 parameters=parameters
             )
 
-            # run workflow: move 384 well plate to incubator (replacing lid)
+            # 12. Run workflow: move 384 well plate to incubator (replacing lid)
             self.workcell_client.submit_workflow(
                 workflow = transfer_384_to_incubator_wf,
                 parameters=parameters
@@ -185,7 +183,7 @@ class DionExperimentApplication(ExperimentApplication):
 
         # END LOOP: all three microplates are in incubator and shaking
 
-        # Incubate all 3 384 well plates overnight (48 hours, no shaking, 37C)
+        # 13. Incubate all 3 384 well plates overnight (48 hours, no shaking, 37C)
         time.sleep(micoplate_incubation_time)
 
         # BEGIN LOOP: take each plate out and read one at a time then place in trash stack
@@ -193,7 +191,7 @@ class DionExperimentApplication(ExperimentApplication):
             microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
-            # run workflow: remove a 384 plate from incubator, remove lid, and read in hidex, then replace lid and move to trash stack
+            # 14. Run workflow: remove a 384 plate from incubator, remove lid, and read in hidex, then replace lid and move to trash stack
             self.workcell_client.submit_workflow(
                 workflow = read_then_trash_384_well_plate_wf,
                 parameters=parameters

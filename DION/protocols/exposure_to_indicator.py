@@ -3,11 +3,31 @@ Generates SOLO .hso instruction file.
 
 """
 from liquidhandling import SoloSoft
-from liquidhandling import DeepBlock_96VWR_75870_792_sterile
+from liquidhandling import PlateDefinition
 
 # TODO: edit z height for deepwell, not flat bottom
 # TODO: Custom plate def for 48 deepwell
 # TODO: Clean up and document
+
+
+### helper plate definition class
+class Plate_48well_deepwell(PlateDefinition):
+    def __new__(cls, plate=None):
+        return PlateDefinition(
+            name="48well_deepwell",
+            plate=plate,
+            plate_height=44.1,
+            well_depth=39.7,
+            rows=16,
+            columns=6,
+            x_offset=4.5,
+            y_offset=0,
+            row_spacing=9,
+            column_spacing=18,
+            comments="Deep 48-well plate",
+        )
+
+
 
 # SOLO PROTOCOL STEPS
 def generate_hso_file(
@@ -32,8 +52,8 @@ def generate_hso_file(
     soloSoft = SoloSoft(
         filename=temp_file_path,
         plateList=[
-            "Empty",
-            "Biorad 384 well (HSP3905)",       # assay plate
+            "48well_deepwell",
+            "Biorad_384_well_HSP3905",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
@@ -63,7 +83,7 @@ def generate_hso_file(
         for j in range(2):  # two transfers needed, 1ul each time
             soloSoft.aspirate(
                 position=exposure_indiacator_plate_location,
-                aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
+                aspirate_volumes=Plate_48well_deepwell().setColumn(
                     exposure_columns[i], half_total_transfer_volume
                 ),
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
@@ -74,7 +94,7 @@ def generate_hso_file(
             )
             soloSoft.dispense(
                 position=exposure_indiacator_plate_location,
-                dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
+                dispense_volumes=Plate_48well_deepwell().setColumn(
                     indicator_columns[i], half_total_transfer_volume
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],

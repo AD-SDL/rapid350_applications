@@ -24,7 +24,7 @@ steps:
       target: "Sealer.Nest"
     comment: Place deepwell plate on sealer
 
-  - name: Seal plate  
+  - name: Seal plate
     node: sealer_harp
     action: seal
     comment: Seal the plate
@@ -41,12 +41,13 @@ steps:
       target: "Liconic.Nest"
     comment: Place deepwell plate on incubator
 
-  # load incubator. (TODO: HOW TO LOAD DEEPWELL PLATES - NEED TO MAKE CHANGES TO LICONIC MODULE)
-  - name: Load Liconic   
+  # load incubator.
+  - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
       plate_id: "1"
+      plate_type: "deep_96well"
     comment: Load assay plate into Liconic
 
   - name: Start shaker at set speed  # Q: what should the shaking speed be for the microplates? Different than deepwell?

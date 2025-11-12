@@ -17,7 +17,7 @@ def generate_hso_file(
     """generate_hso_file
 
     Description:
-         Dispenses control and test compound into dilution column wells of a substrate replicate plate using SOLO liquid handler.
+        Serial dilutes test compound into dilution column wells of a substrate replicate plate using SOLO liquid handler single transfers.
 
     Args:
         payload (dict): input variables from the wei workflow (not used in demo)
@@ -35,8 +35,8 @@ def generate_hso_file(
     soloSoft = SoloSoft(
         filename=temp_file_path,
         plateList=[
-            "Empty",
-            "Biorad 384 well (HSP3905)",       # assay plate
+            "48well_deepwell",
+            "Biorad_384_well_HSP3905",       # assay plate
             "DeepBlock.96.VWR-75870-792.sterile",  # dilution plate
             "DeepBlock.96.VWR-75870-792.sterile",       # stock plate: DMSO, control, and test compounds
             "TipBox.180uL.Axygen-EVF-180-R-S.bluebox",       # 180uL tip box
