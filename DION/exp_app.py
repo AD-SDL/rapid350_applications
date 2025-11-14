@@ -32,7 +32,7 @@ class DionExperimentApplication(ExperimentApplication):
         # workflow path(s)
         refill_tips_wf = self.workflow_directory / "refill_tips.yaml"
         run_solo_wf = self.workflow_directory / "run_solo.yaml"
-        transfer_deelwell_to_incubator_wf = self.workflow_directory / "transfer_deepwell_to_incubator.yaml"
+        transfer_deepwell_to_incubator_wf = self.workflow_directory / "transfer_deepwell_to_incubator.yaml"
         transfer_deepwell_to_SOLO_wf = self.workflow_directory / "transfer_deepwell_to_SOLO.yaml"
         get_new_384_well_plate_wf = self.workflow_directory / "get_new_384_well_plate.yaml"
         transfer_384_to_incubator_wf = self.workflow_directory / "transfer_384_to_incubator.yaml"
@@ -45,7 +45,7 @@ class DionExperimentApplication(ExperimentApplication):
 
         # initial payload
         parameters = {
-            "temp": 37.0, #a float value setting the temperature of the Liconic Incubator (in Celsius)
+            "temp": 37.0, # a float value setting the temperature of the Liconic Incubator (in Celsius)
             "humidity": 95.0, # a float value setting the humidity of the Liconic Incubator
             "shaker_speed": 30, #an integer value setting the shaker speed of the Liconic Incubator
             "stacker": 1, # an integer value specifying which stacker a well plate should be used in (Preferable to use "incubation_plate_id" : plate_id, where plate_id is an integer 1-88 - stacker and slot will be autocalculated)
@@ -95,7 +95,7 @@ class DionExperimentApplication(ExperimentApplication):
             parameters=parameters
         )
 
-        # 5. Run SOLO protocol: dispense cells then diluted copound into exposure wells (col 1,2,3)   # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
+        # 5. Run SOLO protocol: dispense cells then diluted compound into exposure wells (col 1,2,3)   # NEEDS TESTING OF NEW 48 DEEPWELL PLATE TYPE
         # TODO: edit z height for deepwell, not flat bottom
         hso_4, hso_4_lines, hso_4_basename = package_hso(
             dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
@@ -109,7 +109,7 @@ class DionExperimentApplication(ExperimentApplication):
         # 6. Run workflow: (place sterile lid on exposure plate and incubate).  # NOT TESTED
             # Q: Can we just seal instead of using a sterile lid?
         self.workcell_client.submit_workflow(
-            workflow = transfer_deelwell_to_incubator_wf,
+            workflow = transfer_deepwell_to_incubator_wf,
             parameters = parameters
         )
 
