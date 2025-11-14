@@ -17,6 +17,18 @@ from protocols import (
     dispense_into_384_plate
 )
 
+"""
+TODO:
+- Figure out height offset for grabbing deepwell plates
+- Can we pass deepwell plates over the sealer?
+- Sealing/peeling of deepwell plate isn't reliable (doesn't peel all the way off)
+    - experiment with different sealing times? (might need more practice plates for this)
+- Determine total number of tips needed (maybe add another tip box in location 8)
+- Write a README
+
+"""
+
+
 class DionExperimentApplication(ExperimentApplication):
     """Experiment application for Dion's LDRD experiment"""
 
