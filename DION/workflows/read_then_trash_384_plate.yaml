@@ -13,48 +13,48 @@ parameters:
   - name: microplate_id   # id for the 384 well plate to be removed from incubator
 
 steps:
-  - name: Unload Liconic   
+  - name: Unload Liconic
     node: liconic_lisa
     action: unload_plate
     args:
       plate_id: $microplate_id
     comment: remove 384 well plate from Liconic
 
-  # Transfer 384 well plate to Solo.Position 1
+  # Transfer 384 well plate to Solo.Position 2
   - name: Transfer deepwell to sealer
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" 
+      plate_type: "flat_bottom_96well"
     locations:
       source: "Liconic.Nest"
       target: "Solo.Position2"
     comment: Place 384 well plate on Solo deck
 
   # Remove lid
-  - name: Remove lid    
+  - name: Remove lid
     node: platecrane_poly
     action: remove_lid
     args:
-      plate_type: "flat_bottom_96well"   
+      plate_type: "flat_bottom_96well"
     locations:
       source: "Solo.Position2"
       target: "LidNest1"
     comment: Place plate lid on lid nest 1
 
   # open the Hidex
-  - name: Open Hidex  
+  - name: Open Hidex
     node: hidex_howard
     action: open
     comment: Open the Hidex door
 
-  # Transfer 384 well plate to Hidex nest 
+  # Transfer 384 well plate to Hidex nest
   - name: Transfer 384 well plate to Hidex
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" 
-      height_offset: 8  
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
     locations:
       source: "Solo.Position2"
       target: "Hidex.Nest"
@@ -64,12 +64,12 @@ steps:
   - name: run Hidex assay
     node: hidex_howard
     action: run_assay
-    args: 
-      assay_name: "Campaign2_wei_cs"  # TODO: make new Hidex protocol for 384 well plates
+    args:
+      assay_name: "Absorbance_OD590_384"
     comment: Run protocol at hidex
 
   # Open the Hidex
-  - name: Open Hidex  
+  - name: Open Hidex
     node: hidex_howard
     action: open
     comment: Open the Hidex door
@@ -79,32 +79,32 @@ steps:
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" 
-      height_offset: 8  
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
     locations:
       source: "Hidex.Nest"
       target: "Solo.Position2"
     comment: Place 384 well plate on Solo.Position2
 
   # close the Hidex
-  - name: Close Hidex  
+  - name: Close Hidex
     node: hidex_howard
     action: close
     comment: Close the Hidex door
 
   # Replace lid on 384 well plate
-  - name: Replace lid    
+  - name: Replace lid
     node: platecrane_poly
     action: replace_lid
     args:
-      plate_type: "flat_bottom_96well"   
+      plate_type: "flat_bottom_96well"
     locations:
       source: "LidNest1"
       target: "Solo.Position2"
     comment: Replace lid on 384 well plate
 
   # Transfer to trash stack
-  - name: Move plate from Solo Position2 to Stack5. # TODO: Which stack is trash for microplates? 
+  - name: Move plate from Solo Position2 to Stack 5.
     node: platecrane_poly
     action: transfer
     args:
@@ -120,11 +120,11 @@ steps:
 
 
 
-  
 
-  
 
-  
 
-  
+
+
+
+
 

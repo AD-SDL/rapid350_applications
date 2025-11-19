@@ -12,41 +12,39 @@ parameters:
   - name: seal_time
 
 steps:
-  - name: Unload Liconic    # TODO: UNLOAD DEEPWELL PLATE (need to change incubator module?)
+  - name: Unload Liconic
     node: liconic_lisa
     action: unload_plate
     args:
       plate_id: "1"
     comment: Stage pcr plates
 
-  # Tranfer exposure plate to peeler
-  - name: Transfer deepwell to sealer
+  # Transfer exposure plate to peeler
+  - name: Transfer from Liconic to Peeler
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
-      height_offset: 8   # TODO: or change the height offset!!!
+      plate_type: "deep_96well"
     locations:
       source: "Liconic.Nest"
       target: "Peeler.Nest"
     comment: Place deepwell plate on Solo deck
 
-  - name: Peel 
+  - name: Peel
     node: peeler_potato
     action: peel
     comment: null
 
   # Tranfer exposure plate from peeler to solo position 1
-  - name: Transfer deepwell to sealer
+  - name: Transfer to SOLO Pos 1
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
-      height_offset: 8   # TODO: or change the height offset!!!
+      plate_type: "deep_96well"
     locations:
       source: "Peeler.Nest"
       target: "Solo.Position1"
     comment: Place deepwell plate on Solo deck
 
-  
+
 

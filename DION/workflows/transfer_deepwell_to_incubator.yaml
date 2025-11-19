@@ -12,16 +12,15 @@ parameters:
   - name: seal_time
 
 steps:
-  # place sterile lid on deep well plate (Can I just seal???)
+  # place sterile lid on deep well plate --> seal
   - name: Transfer deepwell to sealer
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
-      height_offset: 8   # TODO: or change the height offset!!!
+      plate_type: "deep_96well"
     locations:
       source: "Solo.Position1"
-      target: "Sealer.Nest"
+      target: "Sealer.DeepWell.Nest"
     comment: Place deepwell plate on sealer
 
   - name: Seal plate
@@ -34,14 +33,13 @@ steps:
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well" # TODO: Add another plate type!!!!!
-      height_offset: 8   # TODO: or change the height offset!!!
+      plate_type: "deep_96well"
     locations:
-      source: "Sealer.Nest"
+      source: "Sealer.DeepWell.Nest"
       target: "Liconic.Nest"
     comment: Place deepwell plate on incubator
 
-  # load incubator.
+  # load incubator
   - name: Load Liconic
     node: liconic_lisa
     action: load_plate

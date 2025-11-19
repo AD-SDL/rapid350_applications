@@ -14,7 +14,7 @@ parameters:
 
 steps:
   # replace lid on 384 well plate
-  - name: Replace lid    
+  - name: Replace lid
     node: platecrane_poly
     action: replace_lid
     args:
@@ -30,24 +30,19 @@ steps:
     action: transfer
     args:
       plate_type: "flat_bottom_96well"  # again, this should be fine for 384 well plate
-      height_offset: 8   
+      height_offset: 8
     locations:
       source: "Solo.Position2"
       target: "Liconic.Nest"
     comment: Place 384 well plate on incubator nest
 
-  # load incubator. (TODO: HOW TO LOAD MICROPLATES?? - I suppose they could be loaded to either side of the incubator)
-  - name: Load Liconic   
+  # load incubator
+  - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
       plate_id: $microplate_id
+      plate_type: "flat_bottom_96well"  # again, this is fine for 384 well plate since dimentsions are the same
     comment: Load assay plate into Liconic
 
-  - name: Start shaker at set speed  # Q: Does shaking speed need to be different for deepwell plates
-    node: liconic_lisa
-    action: begin_shake
-    args:
-      shaker_speed: $shaker_speed
-    comment: Stage pcr plates
- 
+  # no shaking needed for 384 well plates
