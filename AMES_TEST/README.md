@@ -1,4 +1,4 @@
-# Next-gen Environmental Factor Assessment (AMES Test) Experiment Application
+# Next-gen Environmental Factor Assessment (Ames Test) Experiment Application
 
 ## Project Overview
 
@@ -76,7 +76,7 @@ We run this experiment application on a Linux machine.
 
 ### Experiment Application Steps
 
-![AMES Test Experiment Application Steps](./figures/workflow_dev_long.jpg)
+![Ames Test Experiment Application Steps](./figures/workflow_dev_long.jpg)
 
 
 
