@@ -1,0 +1,45 @@
+name: Transfer 384-well plate to incubator - Workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to transfer the 384-well plate to incubator
+  version: 0.1
+
+parameters:
+  - name: tip_box_position
+  - name: protocol_file
+  - name: shaker_speed
+  - name: seal_time
+  - name: microplate_id   # id for the 384 well plate to be loaded into incubator
+
+steps:
+  - name: Replace lid
+    node: platecrane_poly
+    action: replace_lid
+    args:
+      plate_type: "flat_bottom_96well"   # The plate is actually a 384-well plate but this definition is ok. Dimensions are the same.
+    locations:
+      source: "Solo.Position2"
+      target: "LidNest1"
+    comment: Replace lid on 384-well plate
+
+  - name: Transfer deepwell to liconic
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Solo.Position2"
+      target: "Liconic.Nest"
+    comment: Place 384-well plate on incubator nest
+
+  - name: Load Liconic
+    node: liconic_lisa
+    action: load_plate
+    args:
+      plate_id: $microplate_id
+      plate_type: "flat_bottom_96well"
+    comment: Load 384-well plate into incubator
+
+  # no shaking needed for 384 well plates

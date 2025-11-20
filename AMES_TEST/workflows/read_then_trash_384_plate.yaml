@@ -1,0 +1,115 @@
+name: Read Absorbance then trash 384-well plate - Workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to take absorbance reading of 384-well plate then transfer it to the trash stack
+  version: 0.1
+
+parameters:
+  - name: tip_box_position
+  - name: protocol_file
+  - name: shaker_speed
+  - name: seal_time
+  - name: microplate_id   # id for the 384 well plate to be removed from incubator
+
+steps:
+  - name: Unload Liconic
+    node: liconic_lisa
+    action: unload_plate
+    args:
+      plate_id: $microplate_id
+    comment: Unload the 384-well plate from the incubator 
+
+  - name: Transfer to SOLO
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Liconic.Nest"
+      target: "Solo.Position2"
+    comment: Place the 384-well plate on Solo deck
+
+  - name: Remove lid
+    node: platecrane_poly
+    action: remove_lid
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Solo.Position2"
+      target: "LidNest1"
+
+  - name: Open Hidex
+    node: hidex_howard
+    action: open
+
+  - name: Transfer the 384-well plate to Hidex
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Solo.Position2"
+      target: "Hidex.Nest"
+
+  - name: Run Hidex assay
+    node: hidex_howard
+    action: run_assay
+    args:
+      assay_name: "Absorbance_OD590_384"
+
+  - name: Open Hidex
+    node: hidex_howard
+    action: open
+    comment: Open the Hidex door
+
+  - name: Transfer to SOLO 
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+      height_offset: 8
+    locations:
+      source: "Hidex.Nest"
+      target: "Solo.Position2"
+    comment: Transfer the 384 well plate from Hidex.Nest to Solo.Position2
+
+  - name: Close Hidex
+    node: hidex_howard
+    action: close
+
+  - name: Replace lid
+    node: platecrane_poly
+    action: replace_lid
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "LidNest1"
+      target: "Solo.Position2"
+    comment: Replace the lid on 384-well plate
+
+  - name: Transfer to Stack
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "flat_bottom_96well"
+    locations:
+      source: "Solo.Position2"
+      target: "Stack5"
+    comment: Place the 384-well plate in the trash stack
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
