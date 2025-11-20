@@ -1,12 +1,8 @@
 """
 Generates SOLO .hso instruction file.
-
 """
 from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
-
-# TODO: should I mix?
-
 
 # SOLO PROTOCOL STEPS
 def generate_hso_file(
@@ -16,19 +12,11 @@ def generate_hso_file(
     """generate_hso_file
 
     Description:
-         Dispenses control and test compound into dilution column wells of a substrate replicate plate using SOLO liquid handler.
+        Dispenses control and test compound into dilution column wells of a substrate replicate plate using SOLO liquid handler.
 
     Args:
         payload (dict): input variables from the wei workflow (not used in demo)
         temp_file_path (str): file path to temporarily save hso file to
-    """
-
-# * Other program variables
-    # general SOLO variables
-    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
-
-    """
-    SOLO STEP 1: TRANSFER DMSO INTO DILUTION COLUMN WELLS -----------------------------------------------------------------
     """
     # * Initialize soloSoft deck layout
     soloSoft = SoloSoft(
@@ -45,6 +33,7 @@ def generate_hso_file(
         ],
     )
 
+    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
 
     control_stock_location = "Position4"  # Location of the control stock plate
     control_stock_row = "A"  # Row in the control stock plate containing control compound
@@ -63,10 +52,6 @@ def generate_hso_file(
 
     # ACTIONS
     # 1. Dispense control compound into dilution plate, well in row A
-
-    # TODO: Do I need a new tip for each half volume transfer?
-    # TODO: What are the correct control and test stock locations: rows, and columns?
-
     soloSoft.getTip("Position5", num_tips=1)
     for i in range(2):
         soloSoft.aspirate(
@@ -102,6 +87,6 @@ def generate_hso_file(
             ),
             dispense_shift=[0, 0, flat_bottom_z_shift],
         )
-    soloSoft.shuckTip()
 
+    soloSoft.shuckTip()
     soloSoft.savePipeline()

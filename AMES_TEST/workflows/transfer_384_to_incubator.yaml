@@ -1,8 +1,8 @@
-name: Transfer deepwell to incubator - Workflow
+name: Transfer 384-well plate to incubator - Workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to transfer 384 well plate to incubator
+  info: Workflow to transfer the 384-well plate to incubator
   version: 0.1
 
 parameters:
@@ -13,36 +13,33 @@ parameters:
   - name: microplate_id   # id for the 384 well plate to be loaded into incubator
 
 steps:
-  # replace lid on 384 well plate
   - name: Replace lid
     node: platecrane_poly
     action: replace_lid
     args:
-      plate_type: "flat_bottom_96well"   # actually a 384 well plate but this def should be fine
+      plate_type: "flat_bottom_96well"   # The plate is actually a 384-well plate but this definition is ok. Dimensions are the same.
     locations:
       source: "Solo.Position2"
       target: "LidNest1"
-    comment: Place plate lid on lid nest 2
+    comment: Replace lid on 384-well plate
 
-  # transfer 384 well plate to incubator
   - name: Transfer deepwell to liconic
     node: platecrane_poly
     action: transfer
     args:
-      plate_type: "flat_bottom_96well"  # again, this should be fine for 384 well plate
+      plate_type: "flat_bottom_96well"
       height_offset: 8
     locations:
       source: "Solo.Position2"
       target: "Liconic.Nest"
-    comment: Place 384 well plate on incubator nest
+    comment: Place 384-well plate on incubator nest
 
-  # load incubator
   - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
       plate_id: $microplate_id
-      plate_type: "flat_bottom_96well"  # again, this is fine for 384 well plate since dimentsions are the same
-    comment: Load assay plate into Liconic
+      plate_type: "flat_bottom_96well"
+    comment: Load 384-well plate into incubator
 
   # no shaking needed for 384 well plates

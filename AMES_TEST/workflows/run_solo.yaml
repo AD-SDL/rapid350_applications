@@ -2,7 +2,7 @@ name: Run SOLO - workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to run a SOLO protocol
+  info: Workflow to run a specified SOLO protocol
   version: 0.1
 
 parameters:
@@ -12,9 +12,9 @@ parameters:
   - name: seal_time
 
 steps:
-  - name: Refill Tips
+  - name: Mix Reactions
     node: solo_sam
-    action: refill_tips
-    args:
-      position: $tip_box_position
-    comment: Reset Tip Box Number to 96 Tips
+    action: run_protocol
+    files:
+      protocol_file: $protocol_file
+    comment: resource check not implemented, but will be

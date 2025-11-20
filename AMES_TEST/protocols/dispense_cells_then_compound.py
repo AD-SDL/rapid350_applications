@@ -5,9 +5,6 @@ Generates SOLO .hso instruction file.
 from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile, PlateDefinition
 
-# TODO: edit z height for deepwell, not flat bottom
-# TODO: Recalibrate SOLO position 1, pipette hitting side of deepwell when dispensing
-# TODO: do I need to define a new plate type in liquidhandling for 48 deepwell? !!!!!!!
 
 ### helper plate definition class
 class Plate_48well_deepwell(PlateDefinition):
@@ -40,14 +37,9 @@ def generate_hso_file(
         payload (dict): input variables from the wei workflow (not used in demo)
         temp_file_path (str): file path to temporarily save hso file to
     """
-
-# * Other program variables
     # general SOLO variables
     flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
 
-    """
-    SOLO STEP 1: TRANSFER DMSO INTO DILUTION COLUMN WELLS -----------------------------------------------------------------
-    """
     # * Initialize soloSoft deck layout
     soloSoft = SoloSoft(
         filename=temp_file_path,
@@ -69,10 +61,10 @@ def generate_hso_file(
     cells_transfer_volume = 240  # will need to do two transfers
     half_cells_transfer_volume = cells_transfer_volume / 2
 
-    # exposure/indiacator plate details
-    exposure_indiacator_plate_location = "Position1"
+    # exposure/indicator plate details
+    exposure_indicator_plate_location = "Position1"
 
-    # compound serial dilutuon plate details
+    # compound serial dilution plate details
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
     dilution_transfer_volume = 10   # 10uL
@@ -98,7 +90,7 @@ def generate_hso_file(
                 dispense_height = flat_bottom_z_shift
             )
             soloSoft.dispense(
-                position=exposure_indiacator_plate_location,
+                position=exposure_indicator_plate_location,
                 dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
                     (i + 1) , half_cells_transfer_volume
                 ),
@@ -120,7 +112,7 @@ def generate_hso_file(
             dispense_height = flat_bottom_z_shift
         )
         soloSoft.dispense(
-            position=exposure_indiacator_plate_location,
+            position=exposure_indicator_plate_location,
             dispense_volumes=Plate_48well_deepwell().setColumn(
                 (i + 1), dilution_transfer_volume
             ),

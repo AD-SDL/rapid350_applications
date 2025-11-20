@@ -1,4 +1,4 @@
-name: Transfer deepwell to incubator - Workflow
+name: Transfer deepwell plate to incubator - Workflow
 
 metadata:
   author: Casey Stone
@@ -12,8 +12,7 @@ parameters:
   - name: seal_time
 
 steps:
-  # place sterile lid on deep well plate --> seal
-  - name: Transfer deepwell to sealer
+  - name: Transfer to Sealer
     node: platecrane_poly
     action: transfer
     args:
@@ -21,15 +20,13 @@ steps:
     locations:
       source: "Solo.Position1"
       target: "Sealer.DeepWell.Nest"
-    comment: Place deepwell plate on sealer
+    comment: Transfer deepwell plate to Sealer.Deepwell.Nest
 
   - name: Seal plate
     node: sealer_harp
     action: seal
-    comment: Seal the plate
 
-  # transfer deepwell to incubator
-  - name: Transfer deepwell to liconic
+  - name: Transfer to Liconic
     node: platecrane_poly
     action: transfer
     args:
@@ -37,20 +34,19 @@ steps:
     locations:
       source: "Sealer.DeepWell.Nest"
       target: "Liconic.Nest"
-    comment: Place deepwell plate on incubator
+    comment: Transfer deepwell plate to Liconic.Nest
 
-  # load incubator
   - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
       plate_id: "1"
       plate_type: "deep_96well"
-    comment: Load assay plate into Liconic
+    comment: Load deepwell plate into Liconic
 
-  - name: Start shaker at set speed  # Q: what should the shaking speed be for the microplates? Different than deepwell?
+  - name: Start shaker
     node: liconic_lisa
     action: begin_shake
     args:
       shaker_speed: $shaker_speed
-    comment: start the shaker
+    comment: Start the shaker with gentle shaking 

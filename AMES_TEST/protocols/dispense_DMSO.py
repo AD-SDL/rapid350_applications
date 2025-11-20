@@ -1,6 +1,5 @@
 """
 Generates SOLO .hso instruction file.
-
 """
 from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
@@ -14,19 +13,11 @@ def generate_hso_file(
     """generate_hso_file
 
     Description:
-         Dispenses DMSO into dilution column wells of a substrate replicate plate using SOLO liquid handler.
+        Dispenses DMSO into dilution column wells of a substrate replicate plate using SOLO liquid handler.
 
     Args:
         payload (dict): input variables from the wei workflow (not used in demo)
         temp_file_path (str): file path to temporarily save hso file to
-    """
-
-# * Other program variables
-    # general SOLO variables
-    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
-
-    """
-    SOLO STEP 1: TRANSFER DMSO INTO DILUTION COLUMN WELLS -----------------------------------------------------------------
     """
     # * Initialize soloSoft deck layout
     soloSoft = SoloSoft(
@@ -43,22 +34,18 @@ def generate_hso_file(
         ],
     )
 
+    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
+
     dmso_stock_location = "Position4"  # Location of the DMSO stock plate
     dmso_stock_column = 1  # Column in the substrate stock plate containing DMSO
     dmso_uL_volumes = [0, 0, 136.7, 136.7, 136.7, 136.7, 136.7, 200]  # DMSO volumes for each well in column 1
 
-    # TODO: Are these volumes correct?
-
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
-
     rows = ["A", "B", "C", "D", "E", "F", "G", "H"]  # Rows in the dilution plate
 
     # ACTIONS
     # 1. Dispense DMSO into each well of dilution column with single channel transfers
-
-    # TODO: what is the DMSO source well? Right now I'm assuming a deepwell plate with all column 1 filled with DMSO
-
     soloSoft.getTip("Position5", num_tips=1)  # same tip for all transfers
     for i in range(len(dmso_uL_volumes)):
         if dmso_uL_volumes[i] > 0:
@@ -67,7 +54,6 @@ def generate_hso_file(
                 # Note: this is a workaround for the 180 uL tip box limitation
                 transfer_volume = dmso_uL_volumes[i] / 2
                 for j in range(2):
-                    # TODO: Are we aspirating from the same row each time?
                     soloSoft.aspirate(
                         position=dmso_stock_location,
                         aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(

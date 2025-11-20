@@ -1,8 +1,8 @@
-name: Transfer deepwell from incubator to SOLO deck - Workflow
+name: Read Absorbance then trash 384-well plate - Workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to transfer deepwell to incubator
+  info: Workflow to take absorbance reading of 384-well plate then transfer it to the trash stack
   version: 0.1
 
 parameters:
@@ -18,10 +18,9 @@ steps:
     action: unload_plate
     args:
       plate_id: $microplate_id
-    comment: remove 384 well plate from Liconic
+    comment: Unload the 384-well plate from the incubator 
 
-  # Transfer 384 well plate to Solo.Position 2
-  - name: Transfer deepwell to sealer
+  - name: Transfer to SOLO
     node: platecrane_poly
     action: transfer
     args:
@@ -29,9 +28,8 @@ steps:
     locations:
       source: "Liconic.Nest"
       target: "Solo.Position2"
-    comment: Place 384 well plate on Solo deck
+    comment: Place the 384-well plate on Solo deck
 
-  # Remove lid
   - name: Remove lid
     node: platecrane_poly
     action: remove_lid
@@ -40,16 +38,12 @@ steps:
     locations:
       source: "Solo.Position2"
       target: "LidNest1"
-    comment: Place plate lid on lid nest 1
 
-  # open the Hidex
   - name: Open Hidex
     node: hidex_howard
     action: open
-    comment: Open the Hidex door
 
-  # Transfer 384 well plate to Hidex nest
-  - name: Transfer 384 well plate to Hidex
+  - name: Transfer the 384-well plate to Hidex
     node: platecrane_poly
     action: transfer
     args:
@@ -58,24 +52,19 @@ steps:
     locations:
       source: "Solo.Position2"
       target: "Hidex.Nest"
-    comment: Place 384 well plate on Hidex nest
 
-  # Read plate in Hidex
-  - name: run Hidex assay
+  - name: Run Hidex assay
     node: hidex_howard
     action: run_assay
     args:
       assay_name: "Absorbance_OD590_384"
-    comment: Run protocol at hidex
 
-  # Open the Hidex
   - name: Open Hidex
     node: hidex_howard
     action: open
     comment: Open the Hidex door
 
-  # Transfer the 384 well plate from Hidex nest to Solo.Position2
-  - name: Transfer 384 well plate to Solo.Position2
+  - name: Transfer to SOLO 
     node: platecrane_poly
     action: transfer
     args:
@@ -84,15 +73,12 @@ steps:
     locations:
       source: "Hidex.Nest"
       target: "Solo.Position2"
-    comment: Place 384 well plate on Solo.Position2
+    comment: Transfer the 384 well plate from Hidex.Nest to Solo.Position2
 
-  # close the Hidex
   - name: Close Hidex
     node: hidex_howard
     action: close
-    comment: Close the Hidex door
 
-  # Replace lid on 384 well plate
   - name: Replace lid
     node: platecrane_poly
     action: replace_lid
@@ -101,10 +87,9 @@ steps:
     locations:
       source: "LidNest1"
       target: "Solo.Position2"
-    comment: Replace lid on 384 well plate
+    comment: Replace the lid on 384-well plate
 
-  # Transfer to trash stack
-  - name: Move plate from Solo Position2 to Stack 5.
+  - name: Transfer to Stack
     node: platecrane_poly
     action: transfer
     args:
@@ -112,7 +97,7 @@ steps:
     locations:
       source: "Solo.Position2"
       target: "Stack5"
-    comment: Place plate in trash stack
+    comment: Place the 384-well plate in the trash stack
 
 
 

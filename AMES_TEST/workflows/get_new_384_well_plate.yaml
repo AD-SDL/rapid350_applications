@@ -1,8 +1,8 @@
-name: Transfer deepwell to incubator - Workflow
+name: Get new 384-well plate - Workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to transfer deepwell to incubator
+  info: Workflow to get a new 384-well plate
   version: 0.1
 
 parameters:
@@ -12,7 +12,7 @@ parameters:
   - name: seal_time
 
 steps:
-  - name: Move plate from Stack1 to Solo.Position2  
+  - name: Transfer new plate to SOLO  
     node: platecrane_poly
     action: transfer
     args:
@@ -20,7 +20,6 @@ steps:
     locations:
       source: "Stack1"
       target: "Solo.Position2"
-    comment: Place plate in Solo Position2
 
   - name: Remove lid    
     node: platecrane_poly
@@ -30,9 +29,8 @@ steps:
     locations:
       source: "Solo.Position2"
       target: "LidNest1"
-    comment: Place plate lid on lid nest 2
 
-  - name: Move platecrane to Safe location  
+  - name: Move PlateCrane arm to Safe location  
     node: platecrane_poly
     action: move
     locations:

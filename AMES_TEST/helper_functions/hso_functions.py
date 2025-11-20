@@ -29,7 +29,6 @@ def package_hso(
         # generate hso file at temp file path
         create_hso_method(payload=payload, temp_file_path=temp_file_path)
     except Exception as error_msg: 
-        # TODO: how to handle this?
         print("Could not create hso at specified temp file path")
         raise error_msg
 

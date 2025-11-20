@@ -1,0 +1,20 @@
+name: Refill Tips - workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to reset tip count at a specified location on the SOLO liquid handler deck
+  version: 0.1
+
+parameters:
+  - name: tip_box_position
+  - name: protocol_file
+  - name: shaker_speed
+  - name: seal_time
+
+steps:
+  - name: Refill Tips
+    node: solo_sam
+    action: refill_tips
+    args:
+      position: $tip_box_position
+    comment: Reset Tip Box Number to 96 Tips

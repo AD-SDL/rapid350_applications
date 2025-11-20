@@ -1,12 +1,8 @@
 """
 Generates SOLO .hso instruction file.
-
 """
 from liquidhandling import SoloSoft
 from liquidhandling import DeepBlock_96VWR_75870_792_sterile
-
-
-# TODO: Should I be getting a new tip for each transfer?
 
 
 # SOLO PROTOCOL STEPS
@@ -24,13 +20,6 @@ def generate_hso_file(
         temp_file_path (str): file path to temporarily save hso file to
     """
 
-# * Other program variables
-    # general SOLO variables
-    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
-
-    """
-    SOLO STEP 1: TRANSFER DMSO INTO DILUTION COLUMN WELLS -----------------------------------------------------------------
-    """
     # * Initialize soloSoft deck layout
     soloSoft = SoloSoft(
         filename=temp_file_path,
@@ -46,6 +35,8 @@ def generate_hso_file(
         ],
     )
 
+    flat_bottom_z_shift = 2  
+
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
     serial_transfer_volume = 63.3
@@ -56,7 +47,7 @@ def generate_hso_file(
     rows = ["A", "B", "C", "D", "E", "F", "G", "H"]  # Rows in the dilution plate
 
     # ACTIONS
-    # serial dilute test compond into dilution plate, wells in row B->G, using same tip, and mix
+    # 1. Serial dilute test compound into dilution plate, wells in row B->G, using same tip, and mix
     soloSoft.getTip("Position5", num_tips=1)
     for i in range(1, 6):
         soloSoft.aspirate(
@@ -77,6 +68,6 @@ def generate_hso_file(
             ),
             dispense_shift=[0, 0, flat_bottom_z_shift],
         )
-    soloSoft.shuckTip()
 
+    soloSoft.shuckTip()
     soloSoft.savePipeline()

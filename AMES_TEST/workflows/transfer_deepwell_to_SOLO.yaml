@@ -1,8 +1,8 @@
-name: Transfer deepwell from incubator to SOLO deck - Workflow
+name: Transfer deepwell plate from incubator to SOLO deck - Workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to transfer deepwell to incubator
+  info: Workflow to transfer deepwell plate to SOLO deck
   version: 0.1
 
 parameters:
@@ -17,10 +17,9 @@ steps:
     action: unload_plate
     args:
       plate_id: "1"
-    comment: Stage pcr plates
+    comment: Unload deepwell plate from incubator
 
-  # Transfer exposure plate to peeler
-  - name: Transfer from Liconic to Peeler
+  - name: Transfer to Peeler
     node: platecrane_poly
     action: transfer
     args:
@@ -28,15 +27,13 @@ steps:
     locations:
       source: "Liconic.Nest"
       target: "Peeler.Nest"
-    comment: Place deepwell plate on Solo deck
+    comment: Transfer deepwell plate to Peeler.Nest
 
   - name: Peel
     node: peeler_potato
     action: peel
-    comment: null
 
-  # Tranfer exposure plate from peeler to solo position 1
-  - name: Transfer to SOLO Pos 1
+  - name: Transfer to SOLO
     node: platecrane_poly
     action: transfer
     args:
@@ -44,7 +41,7 @@ steps:
     locations:
       source: "Peeler.Nest"
       target: "Solo.Position1"
-    comment: Place deepwell plate on Solo deck
+    comment: Transfer deepwell plate to Solo.Position1
 
 
 
