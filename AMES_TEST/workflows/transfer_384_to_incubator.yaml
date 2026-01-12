@@ -6,11 +6,8 @@ metadata:
   version: 0.1
 
 parameters:
-  - name: tip_box_position
-  - name: protocol_file
-  - name: shaker_speed
-  - name: seal_time
-  - name: microplate_id   # id for the 384 well plate to be loaded into incubator
+  json_inputs:
+    - key: microplate_id
 
 steps:
   - name: Replace lid
@@ -38,8 +35,10 @@ steps:
     node: liconic_lisa
     action: load_plate
     args:
-      plate_id: $microplate_id
       plate_type: "flat_bottom_96well"
+    params:
+      args:
+        plate_id: microplate_id
     comment: Load 384-well plate into incubator
 
   # no shaking needed for 384 well plates

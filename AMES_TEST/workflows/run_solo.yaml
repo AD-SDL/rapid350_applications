@@ -9,8 +9,6 @@ parameters:
   file_inputs:
     - key: protocol_file
 
-
-
 steps:
   - name: Mix Reactions
     node: solo_sam

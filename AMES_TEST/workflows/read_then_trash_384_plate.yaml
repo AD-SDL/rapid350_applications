@@ -6,18 +6,16 @@ metadata:
   version: 0.1
 
 parameters:
-  - name: tip_box_position
-  - name: protocol_file
-  - name: shaker_speed
-  - name: seal_time
-  - name: microplate_id   # id for the 384 well plate to be removed from incubator
+  json_inputs:
+    - key: microplate_id
 
 steps:
   - name: Unload Liconic
     node: liconic_lisa
     action: unload_plate
-    args:
-      plate_id: $microplate_id
+    params:
+      args:
+        plate_id: microplate_id
     comment: Unload the 384-well plate from the incubator 
 
   - name: Transfer to SOLO

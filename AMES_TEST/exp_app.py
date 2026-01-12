@@ -131,26 +131,29 @@ class DionExperimentApplication(ExperimentApplication):
         # 6. Seal the exposure/indicator deepwell and transfer into incubator.  # EDITED, NOT TESTED
         self.workcell_client.submit_workflow(
             workflow_definition = transfer_deepwell_to_incubator_wf,
-            parameters = parameters
+            json_inputs={
+                "shaker_speed": parameters["shaker_speed"],
+            }
         )
 
         # 7. Incubate at 37C for 90 min, with gentle shaking.
         time.sleep(exposure_incubation_time)
 
-        # 8. Unload exposure/indicator deepwell from incubator and return to SOLO deck 1.
+        # 8. Unload exposure/indicator deepwell from incubator and return to SOLO deck 1.  # EDITED, NOT TESTED
         self.workcell_client.submit_workflow(
-            workflow = transfer_deepwell_to_SOLO_wf,
-            parameters = parameters
+            workflow_definition = transfer_deepwell_to_SOLO_wf,
         )
 
         # 9. Run SOLO protocol: Transfer all contents of exposure wells to indicator wells.
         hso_5, hso_5_lines, hso_5_basename = package_hso(
             exposure_to_indicator.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp5.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp5.hso"
+        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp5.hso"  # EDITED, NOT TESTED
         self.workcell_client.submit_workflow(
-            workflow = run_solo_wf,
-            parameters=parameters
+            workflow_definition = run_solo_wf,
+            file_inputs={
+                "protocol_file": parameters["protocol_file"],
+            }
         )
 
         # BEGIN LOOP: Loop 3 times to create 3 384-well assay plates.
@@ -158,16 +161,15 @@ class DionExperimentApplication(ExperimentApplication):
             microplate_id = i + 2  # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
-            # 10. Transfer a new 384 well plate to the SOLO deck
+            # 10. Transfer a new 384 well plate to the SOLO deck. # EDITED, NOT TESTED
             self.workcell_client.submit_workflow(
-                workflow = get_new_384_well_plate_wf,
-                parameters=parameters
+                workflow_definition = get_new_384_well_plate_wf,
             )
 
             # 11. Run SOLO protocol: Transfer 50uL from indicator wells into each well of a 384-well plate
             parameters["current_indicator_column"] = i + 4  # indicator columns are 4, 5, and 6
 
-            # 11a. First half of 384-well plate
+            # 11a. First half of 384-well plate. # EDITED, NOT TESTED
             parameters["half"] = 1
             solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+5}.hso"
             hso_6, hso_6_lines, hso_6_basename = package_hso(
@@ -177,11 +179,13 @@ class DionExperimentApplication(ExperimentApplication):
             )
             parameters["protocol_file"] = solo_temp_filename
             self.workcell_client.submit_workflow(
-                workflow = run_solo_wf,
-                parameters=parameters
+                workflow_definition = run_solo_wf,
+                file_inputs={
+                    "protocol_file": parameters["protocol_file"],
+                }
             )
 
-            # 11b. Second half of 384 well plate
+            # 11b. Second half of 384 well plate # EDITED, NOT TESTED
             parameters["half"] = 2
             solo_temp_filename = f"/home/rpl/wei_temp/solo_temp_384_{i+6}.hso"
             hso_7, hso_7_lines, hso_7_basename = package_hso(
@@ -191,14 +195,18 @@ class DionExperimentApplication(ExperimentApplication):
             )
             parameters["protocol_file"] = solo_temp_filename
             self.workcell_client.submit_workflow(
-                workflow = run_solo_wf,
-                parameters=parameters
+                workflow_definition = run_solo_wf,
+                file_inputs={
+                    "protocol_file": parameters["protocol_file"],
+                }
             )
 
-            # 12. Replace lid on 384-well plate and transfer into incubator
+            # 12. Replace lid on 384-well plate and transfer into incubator # EDITED, NOT TESTED
             self.workcell_client.submit_workflow(
-                workflow = transfer_384_to_incubator_wf,
-                parameters=parameters
+                workflow_definition = transfer_384_to_incubator_wf,
+                json_inputs={
+                    "microplate_id": parameters["microplate_id"],
+                }   
             )
 
         # END LOOP.
@@ -212,10 +220,12 @@ class DionExperimentApplication(ExperimentApplication):
             microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
-            # 14. Remove a 384-plate from incubator, remove lid, read in Hidex Sense, replace lid, and move to trash stack
+            # 14. Remove a 384-plate from incubator, remove lid, read in Hidex Sense, replace lid, and move to trash stack. # EDITED, NOT TESTED
             self.workcell_client.submit_workflow(
-                workflow = read_then_trash_384_well_plate_wf,
-                parameters=parameters
+                workflow_definition= read_then_trash_384_well_plate_wf,
+                json_inputs={
+                    "microplate_id": parameters["microplate_id"],
+                }   
             )
 
         # END LOOP.

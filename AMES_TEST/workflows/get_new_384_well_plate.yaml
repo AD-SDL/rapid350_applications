@@ -5,12 +5,6 @@ metadata:
   info: Workflow to get a new 384-well plate
   version: 0.1
 
-parameters:
-  - name: tip_box_position
-  - name: protocol_file
-  - name: shaker_speed
-  - name: seal_time
-
 steps:
   - name: Transfer new plate to SOLO  
     node: platecrane_poly
