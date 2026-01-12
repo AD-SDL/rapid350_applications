@@ -6,15 +6,13 @@ metadata:
   version: 0.1
 
 parameters:
-  - name: tip_box_position
-  - name: protocol_file
-  - name: shaker_speed
-  - name: seal_time
+  json_inputs:
+    - key: tip_box_position
 
 steps:
   - name: Refill Tips
     node: solo_sam
     action: refill_tips
-    args:
-      position: $tip_box_position
-    comment: Reset Tip Box Number to 96 Tips
+    params:
+      args:
+        position: tip_box_position

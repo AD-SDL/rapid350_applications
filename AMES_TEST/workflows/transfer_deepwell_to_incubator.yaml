@@ -6,10 +6,8 @@ metadata:
   version: 0.1
 
 parameters:
-  - name: tip_box_position
-  - name: protocol_file
-  - name: shaker_speed
-  - name: seal_time
+  json_inputs:
+    - key: shaker_speed
 
 steps:
   - name: Transfer to Sealer
@@ -20,7 +18,6 @@ steps:
     locations:
       source: "Solo.Position1"
       target: "Sealer.DeepWell.Nest"
-    comment: Transfer deepwell plate to Sealer.Deepwell.Nest
 
   - name: Seal plate
     node: sealer_harp
@@ -47,6 +44,7 @@ steps:
   - name: Start shaker
     node: liconic_lisa
     action: begin_shake
-    args:
-      shaker_speed: $shaker_speed
-    comment: Start the shaker with gentle shaking 
+    params:
+      args:
+        shaker_speed: shaker_speed
+    comment: Start the shaker with gentle shaking

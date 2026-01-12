@@ -5,21 +5,31 @@ Main MADSci Experiment Application for the AMES Test LDRD Project at Argonne Nat
 """
 
 import datetime
-from madsci.common.types.workflow_types import WorkflowDefinition
-from madsci.common.types.step_types import StepDefinition
-from madsci.client.experiment_application import ExperimentApplication
-from pathlib import Path
 import time
+from pathlib import Path
 
 from helper_functions.hso_functions import package_hso
-from protocols import (
-    dispense_DMSO,
-    dispense_control_and_test,
-    serial_dilute_test_compound,
-    dispense_cells_then_compound,
-    exposure_to_indicator,
-    dispense_into_384_plate
+from madsci.common.types.step_types import StepDefinition
+from madsci.common.types.workflow_types import WorkflowDefinition
+from madsci.experiment_application import (
+    ExperimentApplication,
+    ExperimentApplicationConfig,
 )
+from madsci.client import (
+    ExperimentClient,
+    LocationClient,
+    ResourceClient,
+    WorkcellClient,
+)
+from protocols import (
+    dispense_cells_then_compound,
+    dispense_control_and_test,
+    dispense_DMSO,
+    dispense_into_384_plate,
+    exposure_to_indicator,
+    serial_dilute_test_compound,
+)
+from pydantic import AnyUrl
 
 
 class DionExperimentApplication(ExperimentApplication):
@@ -27,7 +37,12 @@ class DionExperimentApplication(ExperimentApplication):
 
     workflow_directory = Path("./workflows").resolve()
     protocol_directory = Path("./protocols").resolve()
+
     experiment_design = Path("./experiment_design.yaml")
+    config = ExperimentApplicationConfig(node_url=AnyUrl("http://localhost:6000"))
+    experiment_client = ExperimentClient()
+
+
     url = "http://hudson01:8000"
 
     def run_app(self):
@@ -57,55 +72,65 @@ class DionExperimentApplication(ExperimentApplication):
             "protocol_file": "", # string file path to the hso protocol file to be run on SOLO
         }
 
-        # 1. Refill the tips at beginning of experiment run
+        # 1. Refill the tips at beginning of experiment run  # WORKS
         self.workcell_client.submit_workflow(
-            workflow = refill_tips_wf,
-            parameters=parameters
+            workflow_definition = refill_tips_wf,
+            json_inputs={
+                "tip_box_position": parameters["tip_box_position"],
+            }
         )
 
-        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells.
+        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells. # WORKS
         hso_1, hso_1_lines, hso_1_basename = package_hso(
             dispense_DMSO.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp1.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"
         self.workcell_client.submit_workflow(
-            workflow = run_solo_wf,
-            parameters=parameters
+            workflow_definition = run_solo_wf,
+            file_inputs={
+                "protocol_file": parameters["protocol_file"],
+            }
         )
 
-        # 3. Run SOLO protocol: Dispense control and test compounds into dilution column wells.
+        # 3. Run SOLO protocol: Dispense control and test compounds into dilution column wells.  # WORKS
         hso_2, hso_2_lines, hso_2_basename = package_hso(
             dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp2.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp2.hso"
         self.workcell_client.submit_workflow(
-            workflow = run_solo_wf,
-            parameters=parameters
+            workflow_definition = run_solo_wf,
+            file_inputs={
+                "protocol_file": parameters["protocol_file"],
+            }
         )
 
-        # 4. Run SOLO protocol: Serial dilute test compound.
+        # 4. Run SOLO protocol: Serial dilute test compound.   # EDITED, NOT TESTED
         hso_3, hso_3_lines, hso_3_basename = package_hso(
             serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp3.hso"
         self.workcell_client.submit_workflow(
-            workflow = run_solo_wf,
-            parameters=parameters
+            workflow_definition = run_solo_wf,
+            file_inputs={
+                "protocol_file": parameters["protocol_file"],
+            }
         )
 
-        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)
+        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # EDITED, NOT TESTED
         hso_4, hso_4_lines, hso_4_basename = package_hso(
             dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
         )
         parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp4.hso"
         self.workcell_client.submit_workflow(
-            workflow = run_solo_wf,
-            parameters=parameters
+            workflow_definition = run_solo_wf,
+            file_inputs={
+                "protocol_file": parameters["protocol_file"],
+            }
         )
 
-        # 6. Seal the exposure/indicator deepwell and transfer into incubator.
+        # 6. Seal the exposure/indicator deepwell and transfer into incubator.  # EDITED, NOT TESTED
         self.workcell_client.submit_workflow(
-            workflow = transfer_deepwell_to_incubator_wf,
+            workflow_definition = transfer_deepwell_to_incubator_wf,
             parameters = parameters
         )
 
@@ -176,7 +201,7 @@ class DionExperimentApplication(ExperimentApplication):
                 parameters=parameters
             )
 
-        # END LOOP. 
+        # END LOOP.
         # NOTE: At this point, all three 384-well assay plates are in the incubator and shaking.
 
         # 13. Incubate all 3 384-well plates overnight (48 hours, no shaking, 37C).
@@ -193,7 +218,7 @@ class DionExperimentApplication(ExperimentApplication):
                 parameters=parameters
             )
 
-        # END LOOP. 
+        # END LOOP.
         # NOTE: At this point, all three 384-well plates are in the trash stack.
 
 
