@@ -104,7 +104,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 4. Run SOLO protocol: Serial dilute test compound.   # EDITED, NOT TESTED
+        # 4. Run SOLO protocol: Serial dilute test compound.   # WORKS
         hso_3, hso_3_lines, hso_3_basename = package_hso(
             serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
         )
@@ -116,7 +116,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # EDITED, NOT TESTED
+        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # WORKS
         hso_4, hso_4_lines, hso_4_basename = package_hso(
             dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
         )
@@ -129,6 +129,7 @@ class DionExperimentApplication(ExperimentApplication):
         )
 
         # 6. Seal the exposure/indicator deepwell and transfer into incubator.  # EDITED, NOT TESTED
+        TODO: Was there some reason we shouldn't use seals?
         self.workcell_client.submit_workflow(
             workflow_definition = transfer_deepwell_to_incubator_wf,
             json_inputs={
@@ -206,7 +207,7 @@ class DionExperimentApplication(ExperimentApplication):
                 workflow_definition = transfer_384_to_incubator_wf,
                 json_inputs={
                     "microplate_id": parameters["microplate_id"],
-                }   
+                }
             )
 
         # END LOOP.
@@ -225,7 +226,7 @@ class DionExperimentApplication(ExperimentApplication):
                 workflow_definition= read_then_trash_384_well_plate_wf,
                 json_inputs={
                     "microplate_id": parameters["microplate_id"],
-                }   
+                }
             )
 
         # END LOOP.

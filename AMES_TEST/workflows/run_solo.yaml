@@ -10,7 +10,7 @@ parameters:
     - key: protocol_file
 
 steps:
-  - name: Mix Reactions
+  - name: Run SOLO Protocol
     node: solo_sam
     action: run_protocol
     files:

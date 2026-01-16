@@ -10,7 +10,7 @@ parameters:
     - key: tip_box_position
 
 steps:
-  - name: Refill Tips
+  - name: Refill SOLO Tips
     node: solo_sam
     action: refill_tips
     params:
