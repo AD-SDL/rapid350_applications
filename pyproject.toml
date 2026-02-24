@@ -11,6 +11,7 @@ dependencies = [
     "madsci.client~=0.6.0",
     "madsci.common~=0.6.0",
     "madsci.experiment_application~=0.6.0",
+    "liquidhandling",
 ]
 requires-python = ">=3.9.1"
 readme = "README.md"

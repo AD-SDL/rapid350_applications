@@ -47,6 +47,8 @@ class DionExperimentApplication(ExperimentApplication):
 
     def run_app(self):
 
+        # TODO: Create the necessary resources in proper formats.
+
         # workflow path(s)
         refill_tips_wf = self.workflow_directory / "refill_tips.yaml"
         run_solo_wf = self.workflow_directory / "run_solo.yaml"
@@ -80,11 +82,11 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells. # WORKS
+        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells.  # WORKS
         hso_1, hso_1_lines, hso_1_basename = package_hso(
-            dispense_DMSO.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp1.hso"
+            dispense_DMSO.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp1.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp1.hso"
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp1.hso"
         self.workcell_client.submit_workflow(
             workflow_definition = run_solo_wf,
             file_inputs={
@@ -94,9 +96,9 @@ class DionExperimentApplication(ExperimentApplication):
 
         # 3. Run SOLO protocol: Dispense control and test compounds into dilution column wells.  # WORKS
         hso_2, hso_2_lines, hso_2_basename = package_hso(
-            dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp2.hso"
+            dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp2.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp2.hso"
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp2.hso"
         self.workcell_client.submit_workflow(
             workflow_definition = run_solo_wf,
             file_inputs={
@@ -104,11 +106,11 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 4. Run SOLO protocol: Serial dilute test compound.   # WORKS
+        # 4. Run SOLO protocol: Serial dilute test compound.  # WORKS
         hso_3, hso_3_lines, hso_3_basename = package_hso(
-            serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp3.hso"
+            serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp3.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp3.hso"
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp3.hso"
         self.workcell_client.submit_workflow(
             workflow_definition = run_solo_wf,
             file_inputs={
@@ -118,9 +120,9 @@ class DionExperimentApplication(ExperimentApplication):
 
         # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # WORKS
         hso_4, hso_4_lines, hso_4_basename = package_hso(
-            dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/wei_temp/solo_temp4.hso"
+            dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp4.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/wei_temp/solo_temp4.hso"
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp4.hso"
         self.workcell_client.submit_workflow(
             workflow_definition = run_solo_wf,
             file_inputs={
@@ -129,7 +131,7 @@ class DionExperimentApplication(ExperimentApplication):
         )
 
         # 6. Seal the exposure/indicator deepwell and transfer into incubator.  # EDITED, NOT TESTED
-        TODO: Was there some reason we shouldn't use seals?
+        # TODO: Was there some reason we shouldn't use seals?
         self.workcell_client.submit_workflow(
             workflow_definition = transfer_deepwell_to_incubator_wf,
             json_inputs={
