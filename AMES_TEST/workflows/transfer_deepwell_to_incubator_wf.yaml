@@ -10,35 +10,34 @@ parameters:
     - key: shaker_speed
 
 steps:
-  - name: Transfer to Sealer
+  - name: Transfer deep well to Sealer
     node: platecrane_poly
     action: transfer
     args:
       plate_type: "deep_96well"
     locations:
       source: "Solo.Position1"
-      target: "Sealer.DeepWell.Nest"
+      target: "Sealer.Deep_Well.Nest"
 
-  - name: Seal plate
-    node: sealer_harp
-    action: seal
+  # - name: Seal deep well   # BROKEN! NEED TO REPLACE SEALER VACCUUM CUPS
+  #   node: sealer_harp
+  #   action: seal
 
-  - name: Transfer to Liconic
+  - name: Transfer deep well to Liconic
     node: platecrane_poly
     action: transfer
     args:
       plate_type: "deep_96well"
     locations:
-      source: "Sealer.DeepWell.Nest"
+      source: "Sealer.Deep_Well.Nest"
       target: "Liconic.Nest"
-    comment: Transfer deepwell plate to Liconic.Nest
 
   - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
       plate_id: "1"
-      plate_type: "deep_96well"
+      plate_type: "deep_well"
     comment: Load deepwell plate into Liconic
 
   - name: Start shaker

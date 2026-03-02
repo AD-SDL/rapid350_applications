@@ -10,22 +10,20 @@ parameters:
     - key: microplate_id
 
 steps:
-  - name: Replace lid
+  - name: Replace lid on 384-well
     node: platecrane_poly
     action: replace_lid
     args:
-      plate_type: "flat_bottom_96well"   # The plate is actually a 384-well plate but this definition is ok. Dimensions are the same.
+      plate_type: "flat_bottom_96well"
     locations:
-      source: "Solo.Position2"
-      target: "LidNest1"
-    comment: Replace lid on 384-well plate
+      source: "LidNest1"
+      target: "Solo.Position2"
 
-  - name: Transfer deepwell to liconic
+  - name: Transfer 384-well to Liconic
     node: platecrane_poly
     action: transfer
     args:
       plate_type: "flat_bottom_96well"
-      height_offset: 8
     locations:
       source: "Solo.Position2"
       target: "Liconic.Nest"
@@ -35,10 +33,10 @@ steps:
     node: liconic_lisa
     action: load_plate
     args:
-      plate_type: "flat_bottom_96well"
+      plate_type: "microplate"
     params:
       args:
         plate_id: microplate_id
     comment: Load 384-well plate into incubator
 
-  # no shaking needed for 384 well plates
+  # # no shaking needed for 384 well plates

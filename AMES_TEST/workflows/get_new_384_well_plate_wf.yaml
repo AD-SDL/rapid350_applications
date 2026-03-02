@@ -23,10 +23,3 @@ steps:
     locations:
       source: "Solo.Position2"
       target: "LidNest1"
-
-  - name: Move PlateCrane arm to Safe location  
-    node: platecrane_poly
-    action: move
-    locations:
-      target: "Safe"
-    comment: Move platecrane out of the way of SOLO arm

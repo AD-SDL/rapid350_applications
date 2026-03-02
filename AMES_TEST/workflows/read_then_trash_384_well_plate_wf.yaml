@@ -51,11 +51,12 @@ steps:
       source: "Solo.Position2"
       target: "Hidex.Nest"
 
-  - name: Run Hidex assay
-    node: hidex_howard
-    action: run_assay
-    args:
-      assay_name: "Absorbance_OD590_384"
+  # - name: Run Hidex assay   # BUG IN THE HIDEX!
+  #   node: hidex_howard
+  #   action: run_assay
+  #   key: hidex_data
+  #   args:
+  #     assay_name: "AMES_384"
 
   - name: Open Hidex
     node: hidex_howard
