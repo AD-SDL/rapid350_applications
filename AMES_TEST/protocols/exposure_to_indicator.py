@@ -18,7 +18,7 @@ class Plate_48well_deepwell(PlateDefinition):
             plate=plate,
             plate_height=44.1,
             well_depth=39.7,
-            rows=16,
+            rows=8,
             columns=6,
             x_offset=4.5,
             y_offset=0,
@@ -75,18 +75,21 @@ def generate_hso_file(
             soloSoft.aspirate(
                 position=exposure_indicator_plate_location,
                 aspirate_volumes=Plate_48well_deepwell().setColumn(
-                    exposure_columns[i], half_total_transfer_volume
+                    exposure_columns[i], int(half_total_transfer_volume)
                 ),
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
                 mix_at_start = True,
                 mix_cycles = mix_cycles,
                 mix_volume = mix_volume,
                 dispense_height = flat_bottom_z_shift,
+                dwell_after_aspirate=0,
+                move_while_pipetting=False,
+                move_distance=[0,0,0,]
             )
             soloSoft.dispense(
                 position=exposure_indicator_plate_location,
                 dispense_volumes=Plate_48well_deepwell().setColumn(
-                    indicator_columns[i], half_total_transfer_volume
+                    indicator_columns[i], int(half_total_transfer_volume)
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],
                 mix_at_finish = True,

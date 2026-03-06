@@ -19,9 +19,9 @@ steps:
       source: "Solo.Position1"
       target: "Sealer.Deep_Well.Nest"
 
-  # - name: Seal deep well   # BROKEN! NEED TO REPLACE SEALER VACCUUM CUPS
-  #   node: sealer_harp
-  #   action: seal
+  - name: Seal deep well
+    node: sealer_harp
+    action: seal
 
   - name: Transfer deep well to Liconic
     node: platecrane_poly

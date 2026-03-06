@@ -14,7 +14,7 @@ class Plate_48well_deepwell(PlateDefinition):
             plate=plate,
             plate_height=44.1,
             well_depth=39.7,
-            rows=16,
+            rows=8,
             columns=6,
             x_offset=4.5,
             y_offset=0,
@@ -91,7 +91,7 @@ def generate_hso_file(
             )
             soloSoft.dispense(
                 position=exposure_indicator_plate_location,
-                dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
+                dispense_volumes=Plate_48well_deepwell().setColumn(
                     (i + 1) , half_cells_transfer_volume
                 ),
                 dispense_shift=[0, 0, flat_bottom_z_shift],

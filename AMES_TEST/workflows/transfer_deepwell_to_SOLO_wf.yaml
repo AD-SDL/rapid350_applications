@@ -37,5 +37,11 @@ steps:
       target: "Solo.Position1"
     comment: Transfer deepwell plate to Solo.Position1
 
+  - name: Move Safe
+    node: platecrane_poly
+    action: move
+    locations:
+      target: "Safe"
+
 
 

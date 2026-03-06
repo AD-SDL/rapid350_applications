@@ -33,6 +33,14 @@ from protocols import (
 )
 from pydantic import AnyUrl
 
+"""
+TODO:
+- add incubation count downs
+- fix sealer
+- water run
+- overnight/long test
+"""
+
 
 class DionExperimentApplication(ExperimentApplication):
     """Experiment application AMES Test LDRD experiment"""
@@ -151,12 +159,12 @@ class DionExperimentApplication(ExperimentApplication):
             "protocol_file": "", # string file path to the hso protocol file to be run on SOLO
         }
 
-        # Create starting resources.  # WORKS
+        # Create starting resources.
         self.define_starting_resources()
 
         # NOTE: Cannot use lids! They do not fit in the incubator!
 
-        # 1. Refill the tips at beginning of experiment run  # WORKS
+        # 1. Refill the tips at beginning of experiment run
         self.workcell_client.submit_workflow(
             workflow_definition = refill_tips_wf,
             json_inputs={
@@ -164,7 +172,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells.  # WORKS
+        # 2. Run SOLO protocol: Dispense DMSO into dilution column wells.
         hso_1, hso_1_lines, hso_1_basename = package_hso(
             dispense_DMSO.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp1.hso"
         )
@@ -176,7 +184,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 3. Run SOLO protocol: Dispense control and test compounds into dilution column wells.  # WORKS
+        # 3. Run SOLO protocol: Dispense control and test compounds into dilution column wells.
         hso_2, hso_2_lines, hso_2_basename = package_hso(
             dispense_control_and_test.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp2.hso"
         )
@@ -188,7 +196,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 4. Run SOLO protocol: Serial dilute test compound.  # WORKS
+        # 4. Run SOLO protocol: Serial dilute test compound.
         hso_3, hso_3_lines, hso_3_basename = package_hso(
             serial_dilute_test_compound.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp3.hso"
         )
@@ -200,7 +208,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # WORKS
+        # 5. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)
         hso_4, hso_4_lines, hso_4_basename = package_hso(
             dispense_cells_then_compound.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp4.hso"
         )
@@ -212,8 +220,7 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 6. Seal the exposure/indicator deepwell and transfer into incubator.  # WORKS EXCEPT FOR SEALER
-        # TODO: SEALER BROKEN - REPLACE THE VACUUM CUPS
+        # 6. Seal the exposure/indicator deepwell and transfer into incubator.
         self.workcell_client.submit_workflow(
             workflow_definition = transfer_deepwell_to_incubator_wf,
             json_inputs={
@@ -221,10 +228,10 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # 7. Incubate at 37C for 90 min, with gentle shaking.  # WORKING
+        # 7. Incubate at 37C for 90 min, with gentle shaking.
         time.sleep(exposure_incubation_time)
 
-        # 8. Unload exposure/indicator deepwell from incubator and return to SOLO deck 1.  # WORKS
+        # 8. Unload exposure/indicator deepwell from incubator and return to SOLO deck 1.
         self.workcell_client.submit_workflow(
             workflow_definition = transfer_deepwell_to_SOLO_wf,
         )
@@ -233,7 +240,7 @@ class DionExperimentApplication(ExperimentApplication):
         hso_5, hso_5_lines, hso_5_basename = package_hso(
             exposure_to_indicator.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/solo_temp5.hso"
         )
-        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp5.hso"  # EDITED, NOT TESTED
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/solo_temp5.hso"
         self.workcell_client.submit_workflow(
             workflow_definition = run_solo_wf,
             file_inputs={
@@ -241,13 +248,12 @@ class DionExperimentApplication(ExperimentApplication):
             }
         )
 
-        # # BEGIN LOOP: Loop 3 times to create 3 384-well assay plates.
-        # for i in range(3):
-        for i in range(1):  # TESTING
+        # BEGIN LOOP: Loop 3 times to create 3 384-well assay plates.
+        for i in range(3):
             microplate_id = i + 2  # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
-            # 10. Transfer a new 384 well plate to the SOLO deck. # WORKS
+            # 10. Transfer a new 384 well plate to the SOLO deck.
             self.workcell_client.submit_workflow(
                 workflow_definition = get_new_384_well_plate_wf,
             )
@@ -255,7 +261,7 @@ class DionExperimentApplication(ExperimentApplication):
             # 11. Run SOLO protocol: Transfer 50uL from indicator wells into each well of a 384-well plate
             parameters["current_indicator_column"] = i + 4  # indicator columns are 4, 5, and 6
 
-            # 11a. First half of 384-well plate. # EDITED, NOT TESTED
+            # 11a. First half of 384-well plate.
             parameters["half"] = 1
             solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_384_{i+5}.hso"
             hso_6, hso_6_lines, hso_6_basename = package_hso(
@@ -271,7 +277,7 @@ class DionExperimentApplication(ExperimentApplication):
                 }
             )
 
-            # 11b. Second half of 384 well plate # EDITED, NOT TESTED
+            # 11b. Second half of 384 well plate 
             parameters["half"] = 2
             solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_384_{i+6}.hso"
             hso_7, hso_7_lines, hso_7_basename = package_hso(
@@ -287,7 +293,7 @@ class DionExperimentApplication(ExperimentApplication):
                 }
             )
 
-            # 12. Replace lid on 384-well plate and transfer into incubator # WORKS
+            # 12. Replace lid on 384-well plate and transfer into incubator
             self.workcell_client.submit_workflow(
                 workflow_definition = transfer_384_to_incubator_wf,
                 json_inputs={
@@ -298,26 +304,25 @@ class DionExperimentApplication(ExperimentApplication):
         # # END LOOP.
         # # NOTE: At this point, all three 384-well assay plates are in the incubator and shaking.
 
-        # 13. Incubate all 3 384-well plates overnight (48 hours, no shaking, 37C).  # WORKS
+        # 13. Incubate all 3 384-well plates overnight (48 hours, no shaking, 37C).
         time.sleep(micoplate_incubation_time)
 
         # # BEGIN LOOP. Collect absorbance readings for each of the 3 384-well plates and transfer them to trash stack.
         # for i in range(3):
-        for i in range(1):  # TESTING
+        for i in range(1): # TESTING
             microplate_id = i + 2 # 384 well plates will have plate IDs 2, 3, and 4
             parameters["microplate_id"] = str(microplate_id)
 
             # 14. Remove a 384-plate from incubator, remove lid, read in Hidex Sense, replace lid, and move to trash stack.
-            # WORKS EXCEPT FOR HIDEX: Bug? Won't return from run assay. Probably related to automatic saving of files in a specific folder.
             workflow = self.workcell_client.submit_workflow(
                 workflow_definition=read_then_trash_384_well_plate_wf,
                 json_inputs={
                     "microplate_id": parameters["microplate_id"],
                 }
             )
-            # # collect hidex data
-            # hidex_datapoint_id = workflow.get_datapoint_id(step_key="hidex_data", label="json_result")
-            # print(f"{hidex_datapoint_id=}")
+            # collect hidex data
+            hidex_datapoint_id = workflow.get_datapoint_id(step_key="hidex_data", label="json_result")
+            print(f"{hidex_datapoint_id=}")
 
 
         # # END LOOP.
