@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 """
-MADSci Experiment Application for the RAPID 350 Demo.
+MADSci Experiment Application to validate that all instruments on RAPID 350 function correctly.
 """
 
 import datetime
-import time
 from pathlib import Path
 
 from helper_functions.hso_functions import package_hso
@@ -30,8 +29,7 @@ from protocols import (
 from pydantic import AnyUrl
 
 
-
-class DemoApplication(ExperimentApplication):
+class WorkcellValidationApplication(ExperimentApplication):
     """Experiment application AMES Test LDRD experiment"""
 
     workflow_directory = Path("./workflows").resolve()
@@ -57,7 +55,7 @@ class DemoApplication(ExperimentApplication):
 
         # Create and place the three microplate resources.
         microplates = []
-        for i in range(3): 
+        for i in range(1):   # ONLY MAKE ONE 96-WELL PLATE RESOURCE FOR WC VALIDATION
             # Create microplate lid resource.
             current_lid_resource = Resource(
                 resource_name = f"microplate_lid_{i+1}",
@@ -85,7 +83,7 @@ class DemoApplication(ExperimentApplication):
         stack_1_resource = self.resource_client.get_resource(stack_1_resource_id)
         
         # FOR TESTING (remove from if block for real run!)
-        if not len(stack_1_resource.children) == 3: 
+        if not len(stack_1_resource.children) == 1: 
             stack_1_resource.children = microplates   # NOTE: deletes any existing resource in the stack... a complete reset,
             # TODO: it might work better to just push the plate resource onto the stack...
             self.resource_client.update_resource(stack_1_resource)
@@ -93,7 +91,7 @@ class DemoApplication(ExperimentApplication):
     def run_app(self):
 
         # Workflow path(s)
-        demo_wf = self.workflow_directory / "demo_wf.yaml"
+        validation_wf = self.workflow_directory / "validation_wf.yaml"
 
         # Initial payload
         parameters = {
@@ -106,14 +104,12 @@ class DemoApplication(ExperimentApplication):
 
 
         # Prep SOLO protocol files
-        hso_1, hso_1_lines, hso_1_basename = package_hso(
-            solo_transfer1.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/demo_solo_temp1.hso"
-        )
-        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/demo_solo_temp1.hso"
+        package_hso(solo_transfer1.generate_hso_file, parameters, "/home/rpl/workspace/madsci_temp/validation_solo_temp1.hso")
+        parameters["protocol_file"] = "/home/rpl/workspace/madsci_temp/validation_solo_temp1.hso"
 
-        # Run the Demo Workflow
-        self.workcell_client.submit_workflow(
-            workflow_definition = demo_wf,
+        # Run the Workcell Validation Workflow
+        workflow = self.workcell_client.submit_workflow(
+            workflow_definition = validation_wf,
             file_inputs={
                 "protocol_file": parameters["protocol_file"],
             },
@@ -123,16 +119,23 @@ class DemoApplication(ExperimentApplication):
             }
         )
 
+        # Collect resulting 2 hidex data files 
+        hidex_datapoint_1_id = workflow.get_datapoint_id(step_key="hidex_data_1", label="json_result")
+        print(f"{hidex_datapoint_1_id=}")
+        hidex_datapoint_2_id = workflow.get_datapoint_id(step_key="hidex_data_2", label="json_result")
+        print(f"{hidex_datapoint_2_id=}")
+
+
 
 if __name__ == "__main__":
 
     current_time = datetime.datetime.now()
 
-    experiment_app = DemoApplication()
+    experiment_app = WorkcellValidationApplication()
 
     with experiment_app.manage_experiment(
-        run_name=f"Demo experiment app {current_time}",
-        run_description=f"Demo experiment application, started at ~{current_time}",
+        run_name=f"Workcell Validation experiment app {current_time}",
+        run_description=f"Workcell validation experiment application, started at ~{current_time}",
     ):
 
         experiment_app.run_app()
