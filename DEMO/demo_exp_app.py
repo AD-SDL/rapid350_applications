@@ -98,7 +98,7 @@ class DemoApplication(ExperimentApplication):
         # Initial payload
         parameters = {
             "shaker_speed": 20, # an integer value setting the shaker speed of the Liconic Incubator
-            "tip_box_position": "3", # string of an integer 1-8 that identifies the position of the tip box when it is being refilled
+            "tip_box_position": "5", # string of an integer 1-8 that identifies the position of the tip box when it is being refilled
         }
 
         # Create starting resources
