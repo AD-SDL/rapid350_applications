@@ -125,7 +125,6 @@ steps:
     args: 
       plate_id: "1"
 
-  # Transfer plate back to Peeler
   - name: Move plate from Liconic to Peeler
     node: platecrane_poly
     action: transfer
@@ -135,7 +134,6 @@ steps:
       source: "Liconic.Nest"
       target: "Peeler.Nest"
 
-  # Peel
   - name: Peel
     node: peeler_potato
     action: peel
