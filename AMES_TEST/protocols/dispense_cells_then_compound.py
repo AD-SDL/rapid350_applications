@@ -58,7 +58,7 @@ def generate_hso_file(
     # stock cells plate details
     cells_stock_location = "Position6"
     cells_stock_column = 1    # Cell stock needs to be in each well of column 1, at least 800uL+ per well
-    cells_transfer_volume = 240  # will need to do two transfers
+    cells_transfer_volume = 360  # will need to do two transfers
     half_cells_transfer_volume = cells_transfer_volume / 2
 
     # exposure/indicator plate details
@@ -67,11 +67,12 @@ def generate_hso_file(
     # compound serial dilution plate details
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
-    dilution_transfer_volume = 10   # 10uL
+    dilution_transfer_volume = 15  # 15 uL
 
     # mix variables
     mix_cycles = 10
-    mix_volume = 150
+    mix_volume_cells = 150
+    mix_volume_dilution = 70
 
     # ACTIONS
     # 1. Dispense 240 ul cells into each well of exposure columns 1,2, and 3
@@ -86,7 +87,7 @@ def generate_hso_file(
                 aspirate_shift=[0, 0, flat_bottom_z_shift],
                 mix_at_start = True,
                 mix_cycles = mix_cycles,
-                mix_volume = mix_volume,
+                mix_volume = mix_volume_cells,
                 dispense_height = flat_bottom_z_shift
             )
             soloSoft.dispense(
@@ -99,7 +100,7 @@ def generate_hso_file(
 
     # 2. dispense 10ul serial diluted compound into exposure columns 1, 2, and 3
     for i in range(3):
-        soloSoft.getTip("Position5")
+        soloSoft.getTip("Position5")  # new tips for each transfers
         soloSoft.aspirate(
             position=dilution_plate_location,
             aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
@@ -108,7 +109,7 @@ def generate_hso_file(
             aspirate_shift=[0, 0, flat_bottom_z_shift],
             mix_at_start = True,
             mix_cycles = mix_cycles,
-            mix_volume = mix_volume,
+            mix_volume = mix_volume_dilution,
             dispense_height = flat_bottom_z_shift
         )
         soloSoft.dispense(
@@ -119,7 +120,7 @@ def generate_hso_file(
             dispense_shift=[0, 0, flat_bottom_z_shift],
             mix_at_finish = True,
             mix_cycles = mix_cycles,
-            mix_volume = mix_volume,
+            mix_volume = mix_volume_cells,
             aspirate_height = flat_bottom_z_shift,
         )
 

@@ -6,7 +6,7 @@ metadata:
   version: 0.1
 
 steps:
-  - name: Transfer new plate to SOLO  
+  - name: Transfer new plate to SOLO
     node: platecrane_poly
     action: transfer
     args:
@@ -15,7 +15,7 @@ steps:
       source: "Stack1"
       target: "Solo.Position2"
 
-  - name: Remove lid    
+  - name: Remove lid
     node: platecrane_poly
     action: remove_lid
     args:

@@ -35,7 +35,7 @@ def generate_hso_file(
         ],
     )
 
-    flat_bottom_z_shift = 2  
+    flat_bottom_z_shift = 2
 
     dilution_plate_location = "Position3"  # Location of the dilution plate
     dilution_column = 1  # Column in the dilution plate to dispense DMSO
@@ -43,6 +43,7 @@ def generate_hso_file(
 
     mix_volume = 150
     num_mixes = 5
+    final_num_mixes = 3
 
     rows = ["A", "B", "C", "D", "E", "F", "G", "H"]  # Rows in the dilution plate
 
@@ -68,6 +69,31 @@ def generate_hso_file(
             ),
             dispense_shift=[0, 0, flat_bottom_z_shift],
         )
+
+    # Mix after the last dispense
+    soloSoft.aspirate(
+        position=dilution_plate_location,
+        aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+            rows[6], dilution_column, mix_volume
+        ),
+        aspirate_shift=[0, 0, flat_bottom_z_shift],
+        mix_at_start= True,
+        mix_cycles=final_num_mixes,
+        mix_volume=mix_volume,
+        dispense_height = flat_bottom_z_shift
+    )
+    soloSoft.dispense(
+        position=dilution_plate_location,
+        dispense_volumes=DeepBlock_96VWR_75870_792_sterile().setCell(
+            rows[6], dilution_column, mix_volume
+        ),
+        dispense_shift=[0, 0, flat_bottom_z_shift],
+        mix_at_finish = True,
+        mix_cycles = final_num_mixes,
+        mix_volume = mix_volume,
+        aspirate_height = flat_bottom_z_shift,
+
+    )
 
     soloSoft.shuckTip()
     soloSoft.savePipeline()

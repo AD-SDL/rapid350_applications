@@ -16,7 +16,7 @@ steps:
     params:
       args:
         plate_id: microplate_id
-    comment: Unload the 384-well plate from the incubator 
+    comment: Unload the 384-well plate from the incubator
 
   - name: Transfer to SOLO
     node: platecrane_poly
@@ -53,8 +53,8 @@ steps:
 
   - name: Run Hidex assay
     node: hidex_howard
-    action: run_assay
     key: hidex_data
+    action: run_assay
     args:
       assay_name: "AMES_384"
 
@@ -63,7 +63,7 @@ steps:
     action: open
     comment: Open the Hidex door
 
-  - name: Transfer to SOLO 
+  - name: Transfer to SOLO
     node: platecrane_poly
     action: transfer
     args:

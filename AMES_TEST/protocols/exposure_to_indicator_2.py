@@ -1,8 +1,8 @@
 """
 Generates SOLO .hso instruction file.
 
-TODO: 
-- After contents from expose wells dispensed into indicator wells, 
+TODO:
+- After contents from expose wells dispensed into indicator wells,
 complete 15 aspirate dispense cycles within the same indicator column
 aspirating 180uL from the bottom and dispensing at the top of the wells.
 """
@@ -56,7 +56,8 @@ def generate_hso_file(
         ],
     )
 
-    flat_bottom_z_shift = 2  # Note: 1 is not high enough (tested)
+    flat_bottom_z_shift = .8
+    top_z_shift = 25
 
     exposure_indicator_plate_location = "Position1"
     exposure_columns = [1,2,3]
@@ -67,36 +68,60 @@ def generate_hso_file(
     mix_cycles = 10
     mix_volume = 80
 
+    bottom_to_top_mix_cyles = 15
+    bottom_to_top_mix_volume = 150
+
+    i = 1  # second columns
+
     # ACTIONS
     # 1. Dispense all contents of exposure columns (1,2, and 3) into each well of indicator columns (1,2, and 3)
+    # for i in range(3): # three destination columns (1,2,3)
+    #for i in range(1): # TESTING
     soloSoft.getTip("Position5")  # 8-channel transfer, same tips for all transfers
-    for i in range(3): # three destination columns (1,2,3)
-        for j in range(2):  # two transfers needed, 120ul each time
-            soloSoft.aspirate(
-                position=exposure_indicator_plate_location,
-                aspirate_volumes=Plate_48well_deepwell().setColumn(
-                    exposure_columns[i], int(half_total_transfer_volume)
-                ),
-                aspirate_shift=[0, 0, flat_bottom_z_shift],
-                mix_at_start = True,
-                mix_cycles = mix_cycles,
-                mix_volume = mix_volume,
-                dispense_height = flat_bottom_z_shift,
-                dwell_after_aspirate=0,
-                move_while_pipetting=False,
-                move_distance=[0,0,0,]
-            )
-            soloSoft.dispense(
-                position=exposure_indicator_plate_location,
-                dispense_volumes=Plate_48well_deepwell().setColumn(
-                    indicator_columns[i], int(half_total_transfer_volume)
-                ),
-                dispense_shift=[0, 0, flat_bottom_z_shift],
-                mix_at_finish = True,
-                mix_cycles = mix_cycles,
-                mix_volume = mix_volume,
-                aspirate_height = flat_bottom_z_shift,
-            )
+    for j in range(2):  # two transfers needed, 120ul each time
+        soloSoft.aspirate(
+            position=exposure_indicator_plate_location,
+            aspirate_volumes=Plate_48well_deepwell().setColumn(
+                exposure_columns[i], int(half_total_transfer_volume)
+            ),
+            aspirate_shift=[0, 0, flat_bottom_z_shift],
+            mix_at_start = True,
+            mix_cycles = mix_cycles,
+            mix_volume = mix_volume,
+            dispense_height = flat_bottom_z_shift,
+        )
+        soloSoft.dispense(
+            position=exposure_indicator_plate_location,
+            dispense_volumes=Plate_48well_deepwell().setColumn(
+                indicator_columns[i], int(half_total_transfer_volume)
+            ),
+            dispense_shift=[0, 0, flat_bottom_z_shift],
+            mix_at_finish = True,
+            mix_cycles = mix_cycles,
+            mix_volume = mix_volume,
+            aspirate_height = flat_bottom_z_shift,
+        )
+
+    # Add in intensive mix (transfer from the bottom of the well to top, cycling liquid)
+    for k in range(bottom_to_top_mix_cyles):
+        soloSoft.aspirate(
+            position=exposure_indicator_plate_location,
+            aspirate_volumes=Plate_48well_deepwell().setColumn(
+                indicator_columns[i], bottom_to_top_mix_volume
+            ),
+            aspirate_shift=[0, 0, flat_bottom_z_shift],
+            mix_at_start = True,
+            mix_cycles = mix_cycles,
+            mix_volume = bottom_to_top_mix_volume,
+            dispense_height = flat_bottom_z_shift,
+        )
+        soloSoft.dispense(
+            position=exposure_indicator_plate_location,
+            dispense_volumes=Plate_48well_deepwell().setColumn(
+                indicator_columns[i], bottom_to_top_mix_volume
+            ),
+            dispense_shift=[0, 0, top_z_shift],
+        )
 
     soloSoft.shuckTip()
     soloSoft.savePipeline()

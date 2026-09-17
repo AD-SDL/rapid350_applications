@@ -36,7 +36,8 @@ def generate_hso_file(
     )
 
     # variables
-    z_shift = 2
+    z_shift_deepwell = 2
+    z_shift_384 = 4
     transfer_volume = 50
     mix_volume_at_start = 50
     mix_cycles = 5
@@ -59,11 +60,11 @@ def generate_hso_file(
                 aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
                     current_indicator_column, transfer_volume * 2
                 ),
-                aspirate_shift=[0, 0, z_shift],  # flat bottom z shift works here
+                aspirate_shift=[0, 0, z_shift_deepwell],  # flat bottom z shift works here
                 mix_at_start=True,
                 mix_cycles=mix_cycles,
                 mix_volume=mix_volume_at_start,
-                dispense_height = z_shift,
+                dispense_height = z_shift_deepwell,
             )
 
             # 1b. Dispense 50uL into each well rows (A,C,E,G,I,K,M,O) of 384 well plate column i
@@ -72,7 +73,7 @@ def generate_hso_file(
                 dispense_volumes=Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
                     i, transfer_volume
                 ),
-                dispense_shift=[0, 0, z_shift],
+                dispense_shift=[0, 0, z_shift_384],
             )
 
             # 1c. Dispense 50uL into each well rows (B,D,F,H,J,L,N,P) of 384 well plate column i
@@ -83,23 +84,23 @@ def generate_hso_file(
             soloSoft.dispense(
                 position="Position2",
                 dispense_volumes=dispense_volumes_startB,
-                dispense_shift=[0, 0, 2]
+                dispense_shift=[0, 0, z_shift_384]
             )
 
     # 2. Aspirate and dispense into second half of the 384 well plate
     elif half == 2:
-        for i in range(13,25,2):  # there are 24 columns in 384 well plate,
+        for i in range(13,25):  # there are 24 columns in 384 well plate,
             # 2a. Aspirate 100uL from indicator plate column
             soloSoft.aspirate(
                 position=exposure_indicator_plate_location,
                 aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
                     current_indicator_column, transfer_volume * 2
                 ),
-                aspirate_shift=[0, 0, z_shift],  
+                aspirate_shift=[0, 0, z_shift_deepwell],
                 mix_at_start=True,
                 mix_cycles=mix_cycles,
                 mix_volume=mix_volume_at_start,
-                dispense_height = z_shift,
+                dispense_height = z_shift_deepwell,
             )
 
             # 2b. Dispense 50uL into each well rows (A,C,E,G,I,K,M,O) of 384 well plate column i
@@ -108,7 +109,7 @@ def generate_hso_file(
                 dispense_volumes=Plate_384_Corning_3540_BlackwClearBottomAssay().setColumn(
                     i, transfer_volume
                 ),
-                dispense_shift=[0, 0, 2],
+                dispense_shift=[0, 0, z_shift_384],
             )
 
             # 2c. Dispense 50uL into each well rows (B,D,F,H,J,L,N,P) of 384 well plate column i
@@ -119,7 +120,7 @@ def generate_hso_file(
             soloSoft.dispense(
                 position="Position2",
                 dispense_volumes=dispense_volumes_startB,
-                dispense_shift=[0, 0, 2]
+                dispense_shift=[0, 0, z_shift_384],
             )
 
     soloSoft.shuckTip()
