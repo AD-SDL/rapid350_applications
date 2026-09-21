@@ -1,0 +1,18 @@
+name: Refill Tips - workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to reset tip count at a specified location on the SOLO liquid handler deck
+  version: 0.1
+
+parameters:
+  json_inputs:
+    - key: tip_box_position
+
+steps:
+  - name: Refill SOLO Tips
+    node: solo_sam
+    action: refill_tips
+    params:
+      args:
+        position: tip_box_position

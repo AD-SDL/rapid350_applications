@@ -1,0 +1,53 @@
+name: Transfer deepwell plate to incubator - Workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to transfer deepwell to incubator
+  version: 0.1
+
+parameters:
+  json_inputs:
+    - key: shaker_speed
+    - key: plate_id
+
+steps:
+  - name: Transfer deep well to Sealer
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "deep_96well"
+    locations:
+      source: "Solo.Position1"
+      target: "Sealer.Deep_Well.Nest"
+
+  - name: Seal deep well
+    node: sealer_harp
+    action: seal
+
+  - name: Transfer deep well to Liconic
+    node: platecrane_poly
+    action: transfer
+    args:
+      plate_type: "deep_96well"
+    locations:
+      source: "Sealer.Deep_Well.Nest"
+      target: "Liconic.Nest"
+
+  # - name: Load Liconic   # TEST!
+  #   node: liconic_lisa
+  #   action: load_plate
+  #   args:
+  #     # plate_id: "1"
+  #     plate_type: "deep_well"
+  #   params: 
+  #     args: 
+  #       plate_id: plate_id
+  #   comment: Load deepwell plate into Liconic
+
+  # - name: Start shaker
+  #   node: liconic_lisa
+  #   action: begin_shake
+  #   params:
+  #     args:
+  #       shaker_speed: shaker_speed
+  #   comment: Start the shaker with gentle shaking

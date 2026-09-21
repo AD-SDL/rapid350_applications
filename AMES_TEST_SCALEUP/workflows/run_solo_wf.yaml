@@ -1,0 +1,17 @@
+name: Run SOLO - workflow
+
+metadata:
+  author: Casey Stone
+  info: Workflow to run a specified SOLO protocol
+  version: 0.1
+
+parameters:
+  file_inputs:
+    - key: protocol_file
+
+steps:
+  - name: Run SOLO Protocol
+    node: solo_sam
+    action: run_protocol
+    files:
+      protocol_file: protocol_file
