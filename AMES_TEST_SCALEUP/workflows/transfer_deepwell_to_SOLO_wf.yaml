@@ -5,12 +5,19 @@ metadata:
   info: Workflow to transfer deepwell plate to SOLO deck
   version: 0.1
 
+parameters:
+  json_inputs:
+    - key: plate_id
+
 steps:
   - name: Unload Liconic
     node: liconic_lisa
     action: unload_plate
-    args:
-      plate_id: "1"
+    # args:
+      # plate_id: "1"
+    params: 
+      args: 
+        plate_id: plate_id
     comment: Unload deepwell plate from incubator
 
   - name: Transfer to Peeler

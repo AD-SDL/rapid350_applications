@@ -33,21 +33,21 @@ steps:
       source: "Sealer.Deep_Well.Nest"
       target: "Liconic.Nest"
 
-  # - name: Load Liconic   # TEST!
-  #   node: liconic_lisa
-  #   action: load_plate
-  #   args:
-  #     # plate_id: "1"
-  #     plate_type: "deep_well"
-  #   params: 
-  #     args: 
-  #       plate_id: plate_id
-  #   comment: Load deepwell plate into Liconic
+  - name: Load Liconic   # TEST!
+    node: liconic_lisa
+    action: load_plate
+    args:
+      # plate_id: "1"
+      plate_type: "deep_well"
+    params: 
+      args: 
+        plate_id: plate_id
+    comment: Load deepwell plate into Liconic
 
-  # - name: Start shaker
-  #   node: liconic_lisa
-  #   action: begin_shake
-  #   params:
-  #     args:
-  #       shaker_speed: shaker_speed
-  #   comment: Start the shaker with gentle shaking
+  - name: Start shaker
+    node: liconic_lisa
+    action: begin_shake
+    params:
+      args:
+        shaker_speed: shaker_speed
+    comment: Start the shaker with gentle shaking
