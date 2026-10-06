@@ -34,6 +34,7 @@ from protocols import (
     exposure_to_indicator_3
 )
 from pydantic import AnyUrl
+from utils import log_assay_plate_incubation
 
 
 class AMESExperimentApplication(
@@ -147,6 +148,9 @@ class AMESExperimentApplication(
 
     ):
 
+        # TESTING
+        print(f"START TIME: {int(time.time())}")
+
         # workflow path(s)
         refill_tips_wf = self.workflow_directory / "refill_tips_wf.yaml"
         run_solo_wf = self.workflow_directory / "run_solo_wf.yaml"
@@ -157,7 +161,8 @@ class AMESExperimentApplication(
         read_then_trash_384_well_plate_wf = self.workflow_directory / "read_then_trash_384_well_plate_wf.yaml"
 
         # other variables
-        exposure_incubation_time = 5400 # 5400 seconds = 90 min
+        #exposure_incubation_time = 5400 # 5400 seconds = 90 min
+        exposure_incubation_time = 1800 # 30 minutes for testing!!!
         microplate_incubation_time = 172800 # 172800 seconds = 48 hours
         # microplate_incubation_time = 86400 # 86400 seconds = 24 hours (used 03/19/26 to get a 72 hour timepoint reading)
 
@@ -203,7 +208,7 @@ class AMESExperimentApplication(
 
         # START LOOP: Create two exposure/indicator plates and incubate
         for i in range(2): 
-        # for i in range(1):  # FOR TESTING!
+        #for i in range(1): # TESTING
 
             print("***********************")
             print(f"{i=}")
@@ -218,7 +223,7 @@ class AMESExperimentApplication(
             parameters["cell_stock_column"] = cell_stock_columns[i]
             parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
             
-            # 2. Create starting resources.
+            # 2. Create exp/ind deep well 48 resource.
             self.create_deepwell_48_resource(
                 set_num=experiment_set,
                 exp_num=i+1,
@@ -273,8 +278,8 @@ class AMESExperimentApplication(
                 }
             )
 
-            # TODO: TEST
-            # 7. Seal the exposure/indicator deepwell and transfer into incubator.
+            # 7. Seal the exposure/indicator deepwell and transfer into incubator.  # WORKS!
+            # TODO: Fix the sealer or separate into two workflows and seal manually.
             self.workcell_client.submit_workflow(
                 workflow_definition = transfer_deepwell_to_incubator_wf,
                 json_inputs={
@@ -284,6 +289,9 @@ class AMESExperimentApplication(
             )
             # Record incubation start time for exp/ind plate.
             exposure_indicator_incubation_start_times.append(int(time.time()))
+
+             # TESTING
+            print(f"END TIME: {int(time.time())}")
 
             # Wait for user to replace labware before continuing. 
             # TODO: Check which labware needs to be replaced here. 
@@ -309,11 +317,13 @@ class AMESExperimentApplication(
             }
         )
 
-        
-
         # BEGIN LOOP TO CREATE 384-well ASSAY PLATES
         all_assay_384_incubation_start_times = []
+        microplate_ids = []
         for i in range(2): 
+
+            # TESTING
+            print(f"START TIME: {int(time.time())}")
 
             # Reset variables for new loop:
             # TODO: Which of these do we need to reset? 
@@ -394,7 +404,7 @@ class AMESExperimentApplication(
 
             current_round_assay_incubation_start_times = []
             for j in range(3):
-                parameters["microplate_id"] = str(exposure_indicator_incubator_ids[i][j])
+                parameters["microplate_id"] = str(assay_384_well_incubator_ids[i][j])   # TODO: START HERE TOMORROW
 
                 # 13. Transfer a new 384 well plate to the SOLO deck.
                 self.workcell_client.submit_workflow(
@@ -446,61 +456,78 @@ class AMESExperimentApplication(
 
                 # Add incubation start time to list.
                 current_round_assay_incubation_start_times.append(int(time.time()))
+                microplate_ids.append(parameters["microplate_id"])
 
                 # END LOOP to create 3 x 384-well assay plates
             
             all_assay_384_incubation_start_times.append(current_round_assay_incubation_start_times)
+            microplate_ids.append(parameters["microplate_id"])
+
+            # Add entry to tracking file
+            log_assay_plate_incubation(
+                microplate_id=parameters["microplate_id"],
+                incubation_stat_time=int(time.time()),
+            )
+
+            # TESTING
+            print(f"END TIME: {int(time.time())}")
 
         print("ALL ASSAY INCUBATION START TIMES")
         print(all_assay_384_incubation_start_times)
+
+        print("ALL MICROPLATE IDs")
+        print(microplate_ids)
 
         # END LOOP to handle both exp/ind plates and create 3 assay plates for each exp/ind plate.
         # NOTE: At this point, all three 384-well assay plates are in the incubator and shaking.
 
         # TODO: Add end shaking here to stop the microplate side from shaking.
 
-        for i in range(2): 
+        # for i in range(2): 
 
-            # Reset variables for new loop:
-            # TODO: Which of these do we need to reset? 
-            parameters["dmso_stock_column"] = dmso_stock_columns[i]
-            parameters["dilution_column"] = dilution_plate_columns[i]
-            parameters["control_compound_well"] = control_compound_wells[i]
-            parameters["test_compound_well"] = test_compound_wells[i]
-            parameters["control_plate_location"] = control_plate_location
-            parameters["test_plate_location"] = test_plate_location
-            parameters["cell_stock_column"] = cell_stock_columns[i]
-            parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
+        #     # Reset variables for new loop:
+        #     # TODO: Which of these do we need to reset? 
+        #     parameters["dmso_stock_column"] = dmso_stock_columns[i]
+        #     parameters["dilution_column"] = dilution_plate_columns[i]
+        #     parameters["control_compound_well"] = control_compound_wells[i]
+        #     parameters["test_compound_well"] = test_compound_wells[i]
+        #     parameters["control_plate_location"] = control_plate_location
+        #     parameters["test_plate_location"] = test_plate_location
+        #     parameters["cell_stock_column"] = cell_stock_columns[i]
+        #     parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
 
-            for j in range(3):
+        #     for j in range(3):
 
-                parameters["microplate_id"] = exposure_indicator_incubator_ids[i][j]
+        #         parameters["microplate_id"] = exposure_indicator_incubator_ids[i][j]
 
-                # 16. Wait for incubation to complate for each assay plate
-                # TODO: TEST!
-                while time.time() - all_assay_384_incubation_start_times[i][j] < microplate_incubation_time:
-                    print(f"Incubating. Continuing in {int(microplate_incubation_time - (time.time() - all_assay_384_incubation_start_times[i][j]))} seconds.")
-                    time.sleep(5)
+        #         # 16. Wait for incubation to complate for each assay plate
+        #         # TODO: TEST!
+        #         while time.time() - all_assay_384_incubation_start_times[i][j] < microplate_incubation_time:
+        #             print(f"Incubating. Continuing in {int(microplate_incubation_time - (time.time() - all_assay_384_incubation_start_times[i][j]))} seconds.")
+        #             time.sleep(5)
 
-                    if time.time() - all_assay_384_incubation_start_times[i][j] >= microplate_incubation_time:
-                        print("Incubation complete")
-                        break
+        #             if time.time() - all_assay_384_incubation_start_times[i][j] >= microplate_incubation_time:
+        #                 print("Incubation complete")
+        #                 break
 
-                # 17. Remove a 384-plate from incubator, remove lid, read in Hidex Sense, replace lid, and move to trash stack.
-                workflow = self.workcell_client.submit_workflow(
-                    workflow_definition=read_then_trash_384_well_plate_wf,
-                    json_inputs={
-                        "microplate_id": parameters["microplate_id"],
-                    }
-                )
-                # collect hidex data  # DO NOT INCLUDE UNTIL BUG IS FIXED!
-                hidex_datapoint_id = workflow.get_datapoint_id(step_key="hidex_data", label="file")
-                print(f"{hidex_datapoint_id=}")
+        #         # 17. Remove a 384-plate from incubator, remove lid, read in Hidex Sense, replace lid, and move to trash stack.
+        #         workflow = self.workcell_client.submit_workflow(
+        #             workflow_definition=read_then_trash_384_well_plate_wf,
+        #             json_inputs={
+        #                 "microplate_id": parameters["microplate_id"],
+        #             }
+        #         )
+        #         # collect hidex data  # DO NOT INCLUDE UNTIL BUG IS FIXED!
+        #         hidex_datapoint_id = workflow.get_datapoint_id(step_key="hidex_data", label="file")
+        #         print(f"{hidex_datapoint_id=}")
 
-            # END LOOP: Done reading all assay plates in one set
+        #     # END LOOP: Done reading all assay plates in one set
 
-        # END LOOP: Done reading all assay plates in both sets. 
-        # NOTE: At this point, all three 384-well plates are in the trash stack.
+        # # END LOOP: Done reading all assay plates in both sets. 
+        # # NOTE: At this point, all three 384-well plates are in the trash stack.
+
+
+       
 
 
 if __name__ == "__main__":

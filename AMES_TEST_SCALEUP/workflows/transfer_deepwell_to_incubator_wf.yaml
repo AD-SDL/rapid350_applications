@@ -20,9 +20,10 @@ steps:
       source: "Solo.Position1"
       target: "Sealer.Deep_Well.Nest"
 
-  - name: Seal deep well
-    node: sealer_harp
-    action: seal
+  # # TODO: Fix Sealer!
+  # # - name: Seal deep well
+  # #   node: sealer_harp
+  # #   action: seal
 
   - name: Transfer deep well to Liconic
     node: platecrane_poly
@@ -33,16 +34,14 @@ steps:
       source: "Sealer.Deep_Well.Nest"
       target: "Liconic.Nest"
 
-  - name: Load Liconic   # TEST!
+  - name: Load Liconic
     node: liconic_lisa
     action: load_plate
     args:
-      # plate_id: "1"
       plate_type: "deep_well"
     params: 
       args: 
         plate_id: plate_id
-    comment: Load deepwell plate into Liconic
 
   - name: Start shaker
     node: liconic_lisa

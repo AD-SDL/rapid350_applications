@@ -3,22 +3,22 @@ import datetime
 from exp_app_scaleup import AMESExperimentApplication
 
 
-
-dmso_stock_columns = [5,2]  # [1,2]
-dilution_plate_columns = [7,2]  # [1,2]
+# Note: Columns must be integers
+dmso_stock_columns = [1,2]  # [1,2]
+dilution_plate_columns = [1,2]  # [1,2]
 cell_stock_columns = [1,2]
 
-control_compound_wells = ["C1", "D1"]  # ["A1", "B1"]
-test_compound_wells = ["E2", "F2"]    # ["A2", "B2"]
+control_compound_wells = ["A1", "B1"]  # ["A1", "B1"]
+test_compound_wells = ["A2", "B2"]    # ["A2", "B2"]
 control_plate_location = "Position7"
 test_plate_location = "Position7"
 
-exposure_indicator_incubator_ids = [1,5] 
+# Note: Incubator IDs must be strings
+exposure_indicator_incubator_ids = ["1","5"] 
 assay_384_well_incubator_ids = [
-    [2,3,4],
-    [6,7,8],
+    ["2","3","4"],
+    ["6","7","8"],
 ]
-
 
 #  Run the first two experiments
 current_time = datetime.datetime.now()
