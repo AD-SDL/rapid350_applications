@@ -159,6 +159,7 @@ class AMESExperimentApplication(
         get_new_384_well_plate_wf = self.workflow_directory / "get_new_384_well_plate_wf.yaml"
         transfer_384_to_incubator_wf = self.workflow_directory / "transfer_384_to_incubator_wf.yaml"
         read_then_trash_384_well_plate_wf = self.workflow_directory / "read_then_trash_384_well_plate_wf.yaml"
+        remove_old_exp_ind_plate_wf = self.workflow_directory / "remove_old_exp_ind_plate_wf.yaml"
 
         # other variables
         #exposure_incubation_time = 5400 # 5400 seconds = 90 min
@@ -198,116 +199,116 @@ class AMESExperimentApplication(
 
         exposure_indicator_incubation_start_times = []
 
-        # 1. Refill the tips at beginning of experiment run 
-        self.workcell_client.submit_workflow(
-            workflow_definition = refill_tips_wf,
-            json_inputs={
-                "tip_box_position": parameters["tip_box_position"],
-            }
-        )
+        # # 1. Refill the tips at beginning of experiment run 
+        # self.workcell_client.submit_workflow(
+        #     workflow_definition = refill_tips_wf,
+        #     json_inputs={
+        #         "tip_box_position": parameters["tip_box_position"],
+        #     }
+        # )
 
-        # START LOOP: Create two exposure/indicator plates and incubate
-        for i in range(2): 
-        #for i in range(1): # TESTING
+        # # START LOOP: Create two exposure/indicator plates and incubate
+        # for i in range(2): 
+        # #for i in range(1): # TESTING
 
-            print("***********************")
-            print(f"{i=}")
+        #     print("***********************")
+        #     print(f"{i=}")
 
-            # Set variables for current round
-            parameters["dmso_stock_column"] = dmso_stock_columns[i]
-            parameters["dilution_column"] = dilution_plate_columns[i]
-            parameters["control_compound_well"] = control_compound_wells[i]
-            parameters["test_compound_well"] = test_compound_wells[i]
-            parameters["control_plate_location"] = control_plate_location
-            parameters["test_plate_location"] = test_plate_location
-            parameters["cell_stock_column"] = cell_stock_columns[i]
-            parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
+        #     # Set variables for current round
+        #     parameters["dmso_stock_column"] = dmso_stock_columns[i]
+        #     parameters["dilution_column"] = dilution_plate_columns[i]
+        #     parameters["control_compound_well"] = control_compound_wells[i]
+        #     parameters["test_compound_well"] = test_compound_wells[i]
+        #     parameters["control_plate_location"] = control_plate_location
+        #     parameters["test_plate_location"] = test_plate_location
+        #     parameters["cell_stock_column"] = cell_stock_columns[i]
+        #     parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
             
-            # 2. Create exp/ind deep well 48 resource.
-            self.create_deepwell_48_resource(
-                set_num=experiment_set,
-                exp_num=i+1,
-            )
-            print(f"Created EXP/IND resource w/ set = {experiment_set}, exp = {i+1}")
+        #     # 2. Create exp/ind deep well 48 resource.
+        #     self.create_deepwell_48_resource(
+        #         set_num=experiment_set,
+        #         exp_num=i+1,
+        #     )
+        #     print(f"Created EXP/IND resource w/ set = {experiment_set}, exp = {i+1}")
 
-            # 3. Run SOLO protocol: Dispense DMSO into dilution column wells.  # WORKS!
-            hso_1, hso_1_lines, hso_1_basename = package_hso(
-                dispense_DMSO.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_1.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_1.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+        #     # 3. Run SOLO protocol: Dispense DMSO into dilution column wells.  # WORKS!
+        #     hso_1, hso_1_lines, hso_1_basename = package_hso(
+        #         dispense_DMSO.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_1.hso"
+        #     )
+        #     parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_1.hso"
+        #     self.workcell_client.submit_workflow(
+        #         workflow_definition = run_solo_wf,
+        #         file_inputs={
+        #             "protocol_file": parameters["protocol_file"],
+        #         }
+        #     )
 
-            # 4. Run SOLO protocol: Dispense control and test compounds into dilution column wells.  # WORKS!
-            hso_2, hso_2_lines, hso_2_basename = package_hso(
-                dispense_control_and_test.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_2.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_2.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+        #     # 4. Run SOLO protocol: Dispense control and test compounds into dilution column wells.  # WORKS!
+        #     hso_2, hso_2_lines, hso_2_basename = package_hso(
+        #         dispense_control_and_test.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_2.hso"
+        #     )
+        #     parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_2.hso"
+        #     self.workcell_client.submit_workflow(
+        #         workflow_definition = run_solo_wf,
+        #         file_inputs={
+        #             "protocol_file": parameters["protocol_file"],
+        #         }
+        #     )
 
-            # 5. Run SOLO protocol: Serial dilute test compound.  # WORKS!
-            hso_3, hso_3_lines, hso_3_basename = package_hso(
-                serial_dilute_test_compound.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_3.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_3.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+        #     # 5. Run SOLO protocol: Serial dilute test compound.  # WORKS!
+        #     hso_3, hso_3_lines, hso_3_basename = package_hso(
+        #         serial_dilute_test_compound.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_3.hso"
+        #     )
+        #     parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_3.hso"
+        #     self.workcell_client.submit_workflow(
+        #         workflow_definition = run_solo_wf,
+        #         file_inputs={
+        #             "protocol_file": parameters["protocol_file"],
+        #         }
+        #     )
 
-            # 6. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # WORKS!
-            hso_4, hso_4_lines, hso_4_basename = package_hso(
-                dispense_cells_then_compound.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_4.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_4.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+        #     # 6. Run SOLO protocol: Dispense cells then diluted compound into exposure wells (col 1,2,3)  # WORKS!
+        #     hso_4, hso_4_lines, hso_4_basename = package_hso(
+        #         dispense_cells_then_compound.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_4.hso"
+        #     )
+        #     parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_4.hso"
+        #     self.workcell_client.submit_workflow(
+        #         workflow_definition = run_solo_wf,
+        #         file_inputs={
+        #             "protocol_file": parameters["protocol_file"],
+        #         }
+        #     )
 
-            # 7. Seal the exposure/indicator deepwell and transfer into incubator.  # WORKS!
-            # TODO: Fix the sealer or separate into two workflows and seal manually.
-            self.workcell_client.submit_workflow(
-                workflow_definition = transfer_deepwell_to_incubator_wf,
-                json_inputs={
-                    "shaker_speed": parameters["shaker_speed"],
-                    "plate_id": parameters["exp_ind_plate_id"]
-                }
-            )
-            # Record incubation start time for exp/ind plate.
-            exposure_indicator_incubation_start_times.append(int(time.time()))
+        #     # 7. Seal the exposure/indicator deepwell and transfer into incubator.  # WORKS!
+        #     # TODO: Fix the sealer or separate into two workflows and seal manually.
+        #     self.workcell_client.submit_workflow(
+        #         workflow_definition = transfer_deepwell_to_incubator_wf,
+        #         json_inputs={
+        #             "shaker_speed": parameters["shaker_speed"],
+        #             "plate_id": parameters["exp_ind_plate_id"]
+        #         }
+        #     )
+        #     # Record incubation start time for exp/ind plate.
+        #     exposure_indicator_incubation_start_times.append(int(time.time()))
 
-             # TESTING
-            print(f"END TIME: {int(time.time())}")
+        #      # TESTING
+        #     print(f"END TIME: {int(time.time())}")
 
-            # Wait for user to replace labware before continuing. 
-            # TODO: Check which labware needs to be replaced here. 
-            print("############################################################")
-            print("PLEASE PLACE THE NEXT EXPOSURE/INDICATOR PLATE AT SOLO POSITION 1.")
-            input("Press Enter to continue when this is complete.")
+        #     # Wait for user to replace labware before continuing. 
+        #     # TODO: Check which labware needs to be replaced here. 
+        #     print("############################################################")
+        #     print("PLEASE PLACE THE NEXT EXPOSURE/INDICATOR PLATE AT SOLO POSITION 1.")
+        #     input("Press Enter to continue when this is complete.")
 
-        # TESTING: 
-        print(f"Incubation start times: {exposure_indicator_incubation_start_times}")
+        # # TESTING: 
+        # print(f"Incubation start times: {exposure_indicator_incubation_start_times}")
 
 
-        # Wait for user to replace labware before continuing. 
-        # TODO: Check which labware needs to be replaced here. 
-        print("############################################################")
-        print("PLEASE REPLACE THE TIP BOX AT SOLO POSITION 5.")
-        input("Press Enter to continue when this is complete.")
+        # # Wait for user to replace labware before continuing. 
+        # # TODO: Check which labware needs to be replaced here. 
+        # print("############################################################")
+        # print("PLEASE REPLACE THE TIP BOX AT SOLO POSITION 5.")
+        # input("Press Enter to continue when this is complete.")
 
         # 8. Refill the tips before the exposure to indicator transfers
         self.workcell_client.submit_workflow(
@@ -322,8 +323,20 @@ class AMESExperimentApplication(
         microplate_ids = []
         for i in range(2): 
 
-            # TESTING
-            print(f"START TIME: {int(time.time())}")
+            if i == 1: 
+                # Wait for user to replace labware before continuing. 
+                # TODO: Check which labware needs to be replaced here. 
+                print("############################################################")
+                print("PLEASE REPLACE THE TIP BOX AT SOLO POSITION 5.")
+                input("Press Enter to continue when this is complete.")
+
+                # Refill the tips before the final set of 3 assay plates are created.
+                self.workcell_client.submit_workflow(
+                    workflow_definition = refill_tips_wf,
+                    json_inputs={
+                        "tip_box_position": parameters["tip_box_position"],
+                    }
+                )
 
             # Reset variables for new loop:
             # TODO: Which of these do we need to reset? 
@@ -336,16 +349,16 @@ class AMESExperimentApplication(
             parameters["cell_stock_column"] = cell_stock_columns[i]
             parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
 
-            # Wait for the associated exp/ind incubation to finish before starting loop to create 3 assay plates 
-            # 9. Incubate at 37C for 90 min, with gentle shaking.
-            # print(f"Incubating for {exposure_incubation_time} seconds.")
-            while time.time() - exposure_indicator_incubation_start_times[i] < exposure_incubation_time:
-                print(f"Incubating. Continuing in {int(exposure_incubation_time - (time.time() - exposure_indicator_incubation_start_times[i]))} seconds.")
-                time.sleep(5)
+            # # Wait for the associated exp/ind incubation to finish before starting loop to create 3 assay plates 
+            # # 9. Incubate at 37C for 90 min, with gentle shaking.
+            # # print(f"Incubating for {exposure_incubation_time} seconds.")
+            # while time.time() - exposure_indicator_incubation_start_times[i] < exposure_incubation_time:
+            #     print(f"Incubating. Continuing in {int(exposure_incubation_time - (time.time() - exposure_indicator_incubation_start_times[i]))} seconds.")
+            #     time.sleep(5)
 
-                if time.time() - exposure_indicator_incubation_start_times[i] >= exposure_incubation_time:
-                    print("Incubation complete")
-                    break
+            #     if time.time() - exposure_indicator_incubation_start_times[i] >= exposure_incubation_time:
+            #         print("Incubation complete")
+            #         break
 
             # 10. Create 3 x 384-well assay plate MADSci resources and place into Stack 1
             # TODO: TEST!
@@ -363,48 +376,48 @@ class AMESExperimentApplication(
                 }
             )
 
-            # NOTE: No changes needed for multi run!
-            # 12a. Run SOLO protocol: Transfer FIRST exposure column to FIRST indicator column and MIX WELL
-            hso_5, hso_5_lines, hso_5_basename = package_hso(
-                exposure_to_indicator_1.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_5.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_5.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+            # # NOTE: No changes needed for multi run!
+            # # 12a. Run SOLO protocol: Transfer FIRST exposure column to FIRST indicator column and MIX WELL
+            # hso_5, hso_5_lines, hso_5_basename = package_hso(
+            #     exposure_to_indicator_1.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_5.hso"
+            # )
+            # parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_5.hso"
+            # self.workcell_client.submit_workflow(
+            #     workflow_definition = run_solo_wf,
+            #     file_inputs={
+            #         "protocol_file": parameters["protocol_file"],
+            #     }
+            # )
 
-            # NOTE: No changes needed for multi run!
-            # 12b. Run SOLO protocol: Transfer SECOND exposure column to SECOND indicator column and MIX WELL
-            hso_6, hso_6_lines, hso_6_basename = package_hso(
-                exposure_to_indicator_2.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_6.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_6.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+            # # NOTE: No changes needed for multi run!
+            # # 12b. Run SOLO protocol: Transfer SECOND exposure column to SECOND indicator column and MIX WELL
+            # hso_6, hso_6_lines, hso_6_basename = package_hso(
+            #     exposure_to_indicator_2.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_6.hso"
+            # )
+            # parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_6.hso"
+            # self.workcell_client.submit_workflow(
+            #     workflow_definition = run_solo_wf,
+            #     file_inputs={
+            #         "protocol_file": parameters["protocol_file"],
+            #     }
+            # )
 
-            # NOTE: No changes needed for multi run!
-            # 12c. Run SOLO protocol: Transfer THIRD exposure column to THIRD indicator column and MIX WELL
-            hso_7, hso_7_lines, hso_7_basename = package_hso(
-                exposure_to_indicator_3.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_7.hso"
-            )
-            parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_7.hso"
-            self.workcell_client.submit_workflow(
-                workflow_definition = run_solo_wf,
-                file_inputs={
-                    "protocol_file": parameters["protocol_file"],
-                }
-            )
+            # # NOTE: No changes needed for multi run!
+            # # 12c. Run SOLO protocol: Transfer THIRD exposure column to THIRD indicator column and MIX WELL
+            # hso_7, hso_7_lines, hso_7_basename = package_hso(
+            #     exposure_to_indicator_3.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_7.hso"
+            # )
+            # parameters["protocol_file"] = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_7.hso"
+            # self.workcell_client.submit_workflow(
+            #     workflow_definition = run_solo_wf,
+            #     file_inputs={
+            #         "protocol_file": parameters["protocol_file"],
+            #     }
+            # )
 
             current_round_assay_incubation_start_times = []
             for j in range(3):
-                parameters["microplate_id"] = str(assay_384_well_incubator_ids[i][j])   # TODO: START HERE TOMORROW
+                parameters["microplate_id"] = str(assay_384_well_incubator_ids[i][j])   
 
                 # 13. Transfer a new 384 well plate to the SOLO deck.
                 self.workcell_client.submit_workflow(
@@ -414,37 +427,37 @@ class AMESExperimentApplication(
                 # 14. Run SOLO protocol: Transfer 50uL from indicator wells into each well of a 384-well plate
                 parameters["current_indicator_column"] = j + 4  # indicator columns are 4, 5, and 6
 
-                # 14a. First half of 384-well plate.
-                parameters["half"] = 1
-                solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_{j+8}.hso"
-                hso_8, hso_8_lines, hso_8_basename = package_hso(
-                    dispense_into_384_plate.generate_hso_file,
-                    payload=parameters,
-                    temp_file_path=solo_temp_filename,
-                )
-                parameters["protocol_file"] = solo_temp_filename
-                self.workcell_client.submit_workflow(
-                    workflow_definition = run_solo_wf,
-                    file_inputs={
-                        "protocol_file": parameters["protocol_file"],
-                    }
-                )
+                # # 14a. First half of 384-well plate.
+                # parameters["half"] = 1
+                # solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_{j+8}.hso"
+                # hso_8, hso_8_lines, hso_8_basename = package_hso(
+                #     dispense_into_384_plate.generate_hso_file,
+                #     payload=parameters,
+                #     temp_file_path=solo_temp_filename,
+                # )
+                # parameters["protocol_file"] = solo_temp_filename
+                # self.workcell_client.submit_workflow(
+                #     workflow_definition = run_solo_wf,
+                #     file_inputs={
+                #         "protocol_file": parameters["protocol_file"],
+                #     }
+                # )
 
-                # 14b. Second half of 384 well plate
-                parameters["half"] = 2
-                solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_{j+9}.hso"
-                hso_9, hso_9_lines, hso_9_basename = package_hso(
-                    dispense_into_384_plate.generate_hso_file,
-                    payload=parameters,
-                    temp_file_path=solo_temp_filename,
-                )
-                parameters["protocol_file"] = solo_temp_filename
-                self.workcell_client.submit_workflow(
-                    workflow_definition = run_solo_wf,
-                    file_inputs={
-                        "protocol_file": parameters["protocol_file"],
-                    }
-                )
+                # # 14b. Second half of 384 well plate
+                # parameters["half"] = 2
+                # solo_temp_filename = f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_{j+9}.hso"
+                # hso_9, hso_9_lines, hso_9_basename = package_hso(
+                #     dispense_into_384_plate.generate_hso_file,
+                #     payload=parameters,
+                #     temp_file_path=solo_temp_filename,
+                # )
+                # parameters["protocol_file"] = solo_temp_filename
+                # self.workcell_client.submit_workflow(
+                #     workflow_definition = run_solo_wf,
+                #     file_inputs={
+                #         "protocol_file": parameters["protocol_file"],
+                #     }
+                # )
 
                 # 15. Replace lid on 384-well plate and transfer into incubator
                 self.workcell_client.submit_workflow(
@@ -458,19 +471,21 @@ class AMESExperimentApplication(
                 current_round_assay_incubation_start_times.append(int(time.time()))
                 microplate_ids.append(parameters["microplate_id"])
 
+                # Add entry to tracking file
+                log_assay_plate_incubation(
+                    microplate_id=parameters["microplate_id"],
+                    incubation_start_time=int(time.time()),
+                )
+
                 # END LOOP to create 3 x 384-well assay plates
             
             all_assay_384_incubation_start_times.append(current_round_assay_incubation_start_times)
             microplate_ids.append(parameters["microplate_id"])
 
-            # Add entry to tracking file
-            log_assay_plate_incubation(
-                microplate_id=parameters["microplate_id"],
-                incubation_stat_time=int(time.time()),
+        # Remove the old exposure indicator plate
+            self.workcell_client.submit_workflow(
+                workflow_definition = remove_old_exp_ind_plate_wf,
             )
-
-            # TESTING
-            print(f"END TIME: {int(time.time())}")
 
         print("ALL ASSAY INCUBATION START TIMES")
         print(all_assay_384_incubation_start_times)
