@@ -57,6 +57,7 @@ steps:
     action: run_assay
     args:
       assay_name: "AMES_384"
+      expect_data_file: True
 
   - name: Open Hidex
     node: hidex_howard

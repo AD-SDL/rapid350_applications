@@ -1,7 +1,7 @@
 import datetime
 
-from exp_app_scaleup import AMESExperimentApplication
-
+# from AMES_TEST_SCALEUP.exp_app_scaleup_CREATE import AMESExperimentApplication
+from exp_app_scaleup_CREATE import AMESExperimentApplication
 
 # Note: Columns must be integers
 dmso_stock_columns = [1,2]  # [1,2]

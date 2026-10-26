@@ -24,10 +24,12 @@ def log_assay_plate_incubation(
                 "microplate_id",
                 "incubation_start_time",
                 "unix_timestamp",
+                "complete"
             ])
 
         writer.writerow([
             microplate_id,
             readable_time,
             int(incubation_start_time),
+            "false"
         ])
