@@ -224,6 +224,10 @@ class AMESExperimentApplication(
             print("PLEASE PLACE THE NEXT EXPOSURE/INDICATOR PLATE AT SOLO POSITION 1.")
             input("Press Enter to continue when this is complete.")
 
+            print("############################################################")
+            print("PLEASE PLACE A NEW TIP BOX AT SOLO POSITION 5.")
+            input("Press Enter to continue when this is complete.")
+
             # Set variables for current round
             parameters["dmso_stock_column"] = dmso_stock_columns[i]
             parameters["dilution_column"] = dilution_plate_columns[i]
