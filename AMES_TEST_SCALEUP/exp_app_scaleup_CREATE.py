@@ -53,11 +53,6 @@ class AMESExperimentApplication(
     url = "http://hudson01:8000"
 
 
-    # TODOs: 
-    # Correct when new tip boxes and other supplies need to be swapped out. 
-
-
-
     def create_deepwell_48_resource(
         self,
         set_num: int = 1,
@@ -126,9 +121,7 @@ class AMESExperimentApplication(
         stack_1_resource_id = self.location_client.get_location_by_name(location_name="Stack1").resource_id
         stack_1_resource = self.resource_client.get_resource(stack_1_resource_id)
 
-        # FOR TESTING (remove from if block for real run!)
         stack_1_resource.children = microplates   # NOTE: deletes any existing resource in the stack... a complete reset,
-        # TODO: it might work better to just push the plate resource onto the stack...
         self.resource_client.update_resource(stack_1_resource)
 
 
@@ -218,8 +211,6 @@ class AMESExperimentApplication(
             print(f"{i=}")
 
             # Wait for user to replace labware before continuing. 
-            # TODO: Check which labware needs to be replaced here. 
-            
             print("############################################################")
             print("PLEASE PLACE THE NEXT EXPOSURE/INDICATOR PLATE AT SOLO POSITION 1.")
             input("Press Enter to continue when this is complete.")
@@ -293,26 +284,17 @@ class AMESExperimentApplication(
                 }
             )
 
-            # # 7. Seal the exposure/indicator deepwell and transfer into incubator.  # REMOVED TO ALLOW MANUAL SEALING
-            # # TODO: Fix the sealer or separate into two workflows and seal manually.
-            # self.workcell_client.submit_workflow(
-            #     workflow_definition = transfer_deepwell_to_incubator_wf,
-            #     json_inputs={
-            #         "shaker_speed": parameters["shaker_speed"],
-            #         "plate_id": parameters["exp_ind_plate_id"]
-            #     }
-            # )
-
+            # 7a. Transfer the exposure indicator plate to the sealer.
             self.workcell_client.submit_workflow(
                 workflow_definition = deepwell_to_sealer_wf,
             )
 
-            # Wait for user tto manually seal the deep well before continuing.
-            # TODO: Check which labware needs to be replaced here. 
+            # Wait for user to manually seal the deep well before continuing.
             print("############################################################")
             print("PLEASE SEAL THE EXPOSURE/INDICATOR PLATE.")
             input("Press Enter to continue when this is complete.")
 
+            # 7b. Transfer the exposure indicator plate from the sealer to incubator
             self.workcell_client.submit_workflow(
                 workflow_definition = deepwell_sealer_to_incubator_wf,
                 json_inputs={
@@ -323,17 +305,23 @@ class AMESExperimentApplication(
 
             # Record incubation start time for exp/ind plate.
             exposure_indicator_incubation_start_times.append(int(time.time()))
-
-             # TESTING
-            print(f"END TIME: {int(time.time())}")
+            
+            # Wait for 69 minutes after the first chemical. This forces correct exp/indicator timing on the second chemical.
+            if i == 0:
+                remaining_sleep_time = 69 * 60  # 69 minutes
+                print("Sleeping for 69 minutes.")
+                while remaining_sleep_time > 0:
+                    minutes, seconds = divmod(total_seconds, 60)
+                    print(f"Time remaining: {minutes:02d}:{seconds:02d}", flush=True)
+                    time.sleep(5)
+                    total_seconds -= 5
+                print("69 minute sleep concluded.")
 
 
         # TESTING: 
         print(f"Incubation start times: {exposure_indicator_incubation_start_times}")
 
-
-        # Wait for user to replace labware before continuing. 
-        # TODO: Check which labware needs to be replaced here. 
+        # Wait for user to replace labware before continuing.  
         print("############################################################")
         print("PLEASE REPLACE THE TIP BOX AT SOLO POSITION 5.")
         input("Press Enter to continue when this is complete.")
@@ -353,7 +341,6 @@ class AMESExperimentApplication(
 
             if i == 1: 
                 # Wait for user to replace labware before continuing. 
-                # TODO: Check which labware needs to be replaced here. 
                 print("############################################################")
                 print("PLEASE REPLACE THE TIP BOX AT SOLO POSITION 5.")
                 input("Press Enter to continue when this is complete.")
@@ -367,7 +354,6 @@ class AMESExperimentApplication(
                 )
 
             # Reset variables for new loop:
-            # TODO: Which of these do we need to reset? 
             parameters["dmso_stock_column"] = dmso_stock_columns[i]
             parameters["dilution_column"] = dilution_plate_columns[i]
             parameters["control_compound_well"] = control_compound_wells[i]
@@ -377,9 +363,7 @@ class AMESExperimentApplication(
             parameters["cell_stock_column"] = cell_stock_columns[i]
             parameters["exp_ind_plate_id"] = exposure_indicator_incubator_ids[i]
 
-            # Wait for the associated exp/ind incubation to finish before starting loop to create 3 assay plates 
             # 9. Incubate at 37C for 90 min, with gentle shaking.
-            # print(f"Incubating for {exposure_incubation_time} seconds.")
             while time.time() - exposure_indicator_incubation_start_times[i] < exposure_incubation_time:
                 print(f"Incubating. Continuing in {int(exposure_incubation_time - (time.time() - exposure_indicator_incubation_start_times[i]))} seconds.")
                 time.sleep(5)
@@ -388,14 +372,16 @@ class AMESExperimentApplication(
                     print("Incubation complete")
                     break
 
+            # TESTING
+            print(f"ElAPSED TIME ON EXP/IND INCUBATION CHEMICAL {i+1} (in seconds)")
+            print(int(time.time()) - int(exposure_indicator_incubation_start_times[i]))
+
             # 10. Create 3 x 384-well assay plate MADSci resources and place into Stack 1
-            # TODO: TEST!
             self.create_assay_384_resources(
                 set_num=experiment_set,
                 exp_num=i+1,
             )
 
-            # TODO: TEST INCUBATOR PLATE ID CHANGE!
             # 11. Unload exposure/indicator deepwell from incubator and return to SOLO deck 1.
             self.workcell_client.submit_workflow(
                 workflow_definition = transfer_deepwell_to_SOLO_wf,
@@ -404,7 +390,11 @@ class AMESExperimentApplication(
                 }
             )
 
-            # NOTE: No changes needed for multi run!
+            # Pause to check that seal was removed correctly. Prompt user input. 
+            print("############################################################")
+            print("PLEASE CHECK THAT THE SEAL WAS REMOVED CORRECTLY.")
+            input("Press Enter to continue when this is complete.")
+
             # 12a. Run SOLO protocol: Transfer FIRST exposure column to FIRST indicator column and MIX WELL
             hso_5, hso_5_lines, hso_5_basename = package_hso(
                 exposure_to_indicator_1.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_5.hso"
@@ -417,7 +407,6 @@ class AMESExperimentApplication(
                 }
             )
 
-            # NOTE: No changes needed for multi run!
             # 12b. Run SOLO protocol: Transfer SECOND exposure column to SECOND indicator column and MIX WELL
             hso_6, hso_6_lines, hso_6_basename = package_hso(
                 exposure_to_indicator_2.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_6.hso"
@@ -430,7 +419,6 @@ class AMESExperimentApplication(
                 }
             )
 
-            # NOTE: No changes needed for multi run!
             # 12c. Run SOLO protocol: Transfer THIRD exposure column to THIRD indicator column and MIX WELL
             hso_7, hso_7_lines, hso_7_basename = package_hso(
                 exposure_to_indicator_3.generate_hso_file, parameters, f"/home/rpl/workspace/madsci_temp/solo_temp_set{str(experiment_set)}_exp{i+1}_7.hso"

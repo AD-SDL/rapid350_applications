@@ -45,6 +45,11 @@ with experiment_app.manage_experiment(
         
     )
 
+# Give the user a heads up that set 2 is about to begin.
+print("**********************************")
+print("SET 4 WILL BEGIN NOW - day 2.")
+input("Press Enter to continue to set 4.")
+    
 
 # SET 4 ======================
 
