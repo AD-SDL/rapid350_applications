@@ -65,7 +65,7 @@ def generate_hso_file(
     total_transfer_volume = 240
     half_total_transfer_volume = total_transfer_volume / 2
 
-    mix_cycles = 5
+    mix_cycles = 5  # TODO: Check that we want to mix only 5 times here!
     mix_volume = 80
 
     bottom_to_top_mix_cyles = 15

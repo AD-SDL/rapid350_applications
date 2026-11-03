@@ -2,7 +2,7 @@ name: Transfer deepwell plate to sealer - Workflow
 
 metadata:
   author: Casey Stone
-  info: Workflow to transfer deepwell to incubator
+  info: Workflow to transfer deepwell to sealer
   version: 0.1
 
 steps:

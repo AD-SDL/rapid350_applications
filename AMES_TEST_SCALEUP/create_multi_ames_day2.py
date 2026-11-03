@@ -45,7 +45,7 @@ with experiment_app.manage_experiment(
         
     )
 
-# Give the user a heads up that set 2 is about to begin.
+# Give the user a heads up that set 4 is about to begin.
 print("**********************************")
 print("SET 4 WILL BEGIN NOW - day 2.")
 input("Press Enter to continue to set 4.")
@@ -56,7 +56,7 @@ input("Press Enter to continue to set 4.")
 # Note: Columns must be integers
 dmso_stock_columns = [3,4]  
 dilution_plate_columns = [3,4]
-cell_stock_columns = [1,2]  # using a new cell stock plate...
+cell_stock_columns = [11,12]  # using a new cell stock plate...
 
 control_compound_wells = ["G1", "H1"]  
 test_compound_wells = ["G2", "H2"]   

@@ -55,7 +55,7 @@ input("Press Enter to continue to set 2.")
 # Note: Columns must be integers
 dmso_stock_columns = [3,4]  
 dilution_plate_columns = [3,4]
-cell_stock_columns = [1,2]  # using a new cell stock plate...
+cell_stock_columns = [11,12]  # Using the other side of the original cell stock plate
 
 control_compound_wells = ["C1", "D1"]  
 test_compound_wells = ["C2", "D2"]   

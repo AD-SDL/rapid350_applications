@@ -203,6 +203,10 @@ class AMESExperimentApplication(
             }
         )
 
+        print("############################################################")
+        print("PLEASE PLACE A NEW TIP BOX AT SOLO POSITION 5.")
+        input("Press Enter to continue when this is complete.")
+
         # START LOOP: Create two exposure/indicator plates and incubate
         for i in range(2): 
         #for i in range(1): # TESTING
@@ -213,10 +217,6 @@ class AMESExperimentApplication(
             # Wait for user to replace labware before continuing. 
             print("############################################################")
             print("PLEASE PLACE THE NEXT EXPOSURE/INDICATOR PLATE AT SOLO POSITION 1.")
-            input("Press Enter to continue when this is complete.")
-
-            print("############################################################")
-            print("PLEASE PLACE A NEW TIP BOX AT SOLO POSITION 5.")
             input("Press Enter to continue when this is complete.")
 
             # Set variables for current round
@@ -311,10 +311,10 @@ class AMESExperimentApplication(
                 remaining_sleep_time = 69 * 60  # 69 minutes
                 print("Sleeping for 69 minutes.")
                 while remaining_sleep_time > 0:
-                    minutes, seconds = divmod(total_seconds, 60)
+                    minutes, seconds = divmod(remaining_sleep_time, 60)
                     print(f"Time remaining: {minutes:02d}:{seconds:02d}", flush=True)
                     time.sleep(5)
-                    total_seconds -= 5
+                    remaining_sleep_time -= 5
                 print("69 minute sleep concluded.")
 
 

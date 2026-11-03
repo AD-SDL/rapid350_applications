@@ -62,8 +62,7 @@ def generate_hso_file(
 
     # stock cells plate details
     cells_stock_location = "Position6"
-    # cells_stock_column = 1    # Cell stock needs to be in each well of column 1, at least 800uL+ per well
-    cells_stock_column = payload["cell_stock_column"]   # Cell stock needs to be in each well of column 1, at least 800uL+ per well
+    cells_stock_column = payload["cell_stock_column"]   # Cell stock needs to be in each well of the column, ideally 500uL per well (450uL minimum)
     cells_transfer_volume = 360  # will need to do two transfers
     half_cells_transfer_volume = cells_transfer_volume / 2
 
@@ -72,7 +71,6 @@ def generate_hso_file(
 
     # compound serial dilution plate details
     dilution_plate_location = "Position3"  # Location of the dilution plate
-    # dilution_column = 1  # Column in the dilution plate to dispense DMSO
     dilution_column = payload["dilution_column"] # Column in the dilution plate to dispense DMSO
     dilution_transfer_volume = 15  # 15 uL
 
@@ -82,7 +80,7 @@ def generate_hso_file(
     mix_volume_dilution = 70
 
     # ACTIONS
-    # 1. Dispense 240 ul cells into each well of exposure columns 1,2, and 3
+    # 1. Dispense 360 ul cells into each well of exposure columns 1,2, and 3
     soloSoft.getTip("Position5")  # 8-channel transfer, same tips for all transfers
     for i in range(3): # three destination columns (1,2,3)
         for j in range(2):  # two transfers needed, 120ul each time
@@ -105,7 +103,7 @@ def generate_hso_file(
                 dispense_shift=[0, 0, flat_bottom_z_shift],
             )
 
-    # 2. dispense 10ul serial diluted compound into exposure columns 1, 2, and 3
+    # 2. Dispense 10ul serial diluted compound into exposure columns 1, 2, and 3
     for i in range(3):
         soloSoft.getTip("Position5")  # new tips for each transfers
         soloSoft.aspirate(

@@ -56,7 +56,7 @@ def generate_hso_file(
     test_compound_volume = 200  # Test compound volumes for each well in column 1
 
     dilution_plate_location = "Position3"  # Location of the dilution plate
-    dilution_column = 1  # Column in the dilution plate to dispense DMSO
+    dilution_column = payload["dilution_column"]  # Column in the dilution plate to dispense DMSO
 
     rows = ["A", "B", "C", "D", "E", "F", "G", "H"]  # Rows in the dilution plate
 

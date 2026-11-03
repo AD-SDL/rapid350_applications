@@ -13,8 +13,6 @@ steps:
   - name: Unload Liconic
     node: liconic_lisa
     action: unload_plate
-    # args:
-      # plate_id: "1"
     params: 
       args: 
         plate_id: plate_id
