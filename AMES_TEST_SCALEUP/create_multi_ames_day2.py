@@ -32,7 +32,7 @@ with experiment_app.manage_experiment(
     run_description=f"Run for AMES Test LDRD experiment, started at ~{current_time}",
 ):
     experiment_app.run_app(
-        experiment_set = 1,
+        experiment_set = 3,
         dmso_stock_columns = dmso_stock_columns,
         dilution_plate_columns = dilution_plate_columns,
         cell_stock_columns = cell_stock_columns,
@@ -78,7 +78,7 @@ with experiment_app.manage_experiment(
     run_description=f"Run for AMES Test LDRD experiment, started at ~{current_time}",
 ):
     experiment_app.run_app(
-        experiment_set = 1,
+        experiment_set = 4,
         dmso_stock_columns = dmso_stock_columns,
         dilution_plate_columns = dilution_plate_columns,
         cell_stock_columns = cell_stock_columns,

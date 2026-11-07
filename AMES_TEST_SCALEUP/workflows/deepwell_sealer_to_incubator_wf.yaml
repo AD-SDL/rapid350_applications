@@ -32,6 +32,8 @@ steps:
   - name: Start shaker
     node: liconic_lisa
     action: begin_shake
+    args:
+      shaker_id: 2
     params:
       args:
         shaker_speed: shaker_speed

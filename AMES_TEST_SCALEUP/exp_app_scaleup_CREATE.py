@@ -159,10 +159,6 @@ class AMESExperimentApplication(
         # other variables
         exposure_incubation_time = 5400 # 5400 seconds = 90 min
 
-        # FOR TESTING!
-        # exposure_incubation_time = 1800 # 30 minutes for testing!!!
-
-
         # initial payload
         parameters = {
             "temp": 37.0, # a float value setting the temperature of the Liconic Incubator (in Celsius)

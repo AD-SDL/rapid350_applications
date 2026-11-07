@@ -83,7 +83,7 @@ def generate_hso_file(
     # 1. Dispense 360 ul cells into each well of exposure columns 1,2, and 3
     soloSoft.getTip("Position5")  # 8-channel transfer, same tips for all transfers
     for i in range(3): # three destination columns (1,2,3)
-        for j in range(2):  # two transfers needed, 120ul each time
+        for j in range(2):  # two transfers needed, 180ul each time
             soloSoft.aspirate(
                 position=cells_stock_location,
                 aspirate_volumes=DeepBlock_96VWR_75870_792_sterile().setColumn(
@@ -128,6 +128,8 @@ def generate_hso_file(
             mix_volume = mix_volume_cells,
             aspirate_height = flat_bottom_z_shift,
         )
+
+    # TODO: Can remove the mix at the end here! Redundant since it goes into the shaker for 90 minutes right after. 
 
     soloSoft.shuckTip()
     soloSoft.savePipeline()

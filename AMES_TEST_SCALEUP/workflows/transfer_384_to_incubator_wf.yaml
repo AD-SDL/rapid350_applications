@@ -39,9 +39,11 @@ steps:
         plate_id: microplate_id
     comment: Load 384-well plate into incubator
 
-  # no shaking needed for 384 well plates
+  # no shaking needed for 384 well plates  # TODO: TEST THIS!
   - name: End Shake
     node: liconic_lisa
     action: end_shake
+    args:
+      shaker_id: 1
 
 
